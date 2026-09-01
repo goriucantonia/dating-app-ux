@@ -54,6 +54,7 @@ _Analysis _$AnalysisFromJson(Map<String, dynamic> json) => _Analysis(
           .toList() ??
       const <Candidate>[],
   message: json['message'] as String?,
+  progress: json['progress'] as Map<String, dynamic>?,
 );
 
 Map<String, dynamic> _$AnalysisToJson(_Analysis instance) => <String, dynamic>{
@@ -64,4 +65,5 @@ Map<String, dynamic> _$AnalysisToJson(_Analysis instance) => <String, dynamic>{
   'created_at': instance.createdAt,
   'candidates': instance.candidates,
   'message': instance.message,
+  'progress': instance.progress,
 };

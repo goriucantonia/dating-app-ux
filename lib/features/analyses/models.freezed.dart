@@ -331,7 +331,7 @@ as String,
 /// @nodoc
 mixin _$Analysis {
 
- String get id; String get status;@JsonKey(name: 'pool_status') String? get poolStatus; String? get error;@JsonKey(name: 'created_at') String get createdAt; List<Candidate> get candidates; String? get message;
+ String get id; String get status;@JsonKey(name: 'pool_status') String? get poolStatus; String? get error;@JsonKey(name: 'created_at') String get createdAt; List<Candidate> get candidates; String? get message; Map<String, dynamic>? get progress;
 /// Create a copy of Analysis
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -345,20 +345,20 @@ $AnalysisCopyWith<Analysis> get copyWith => _$AnalysisCopyWithImpl<Analysis>(thi
 @override
 bool operator ==(Object other) {
   final _this = this as Analysis;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Analysis&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.status, _this.status) || other.status == _this.status)&&(identical(other.poolStatus, _this.poolStatus) || other.poolStatus == _this.poolStatus)&&(identical(other.error, _this.error) || other.error == _this.error)&&(identical(other.createdAt, _this.createdAt) || other.createdAt == _this.createdAt)&&const DeepCollectionEquality().equals(other.candidates, _this.candidates)&&(identical(other.message, _this.message) || other.message == _this.message));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Analysis&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.status, _this.status) || other.status == _this.status)&&(identical(other.poolStatus, _this.poolStatus) || other.poolStatus == _this.poolStatus)&&(identical(other.error, _this.error) || other.error == _this.error)&&(identical(other.createdAt, _this.createdAt) || other.createdAt == _this.createdAt)&&const DeepCollectionEquality().equals(other.candidates, _this.candidates)&&(identical(other.message, _this.message) || other.message == _this.message)&&const DeepCollectionEquality().equals(other.progress, _this.progress));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
   final _this = this as Analysis;
-  return Object.hash(runtimeType,_this.id,_this.status,_this.poolStatus,_this.error,_this.createdAt,const DeepCollectionEquality().hash(_this.candidates),_this.message);
+  return Object.hash(runtimeType,_this.id,_this.status,_this.poolStatus,_this.error,_this.createdAt,const DeepCollectionEquality().hash(_this.candidates),_this.message,const DeepCollectionEquality().hash(_this.progress));
 }
 
 @override
 String toString() {
   final _this = this as Analysis;
-  return 'Analysis(id: ${_this.id}, status: ${_this.status}, poolStatus: ${_this.poolStatus}, error: ${_this.error}, createdAt: ${_this.createdAt}, candidates: ${_this.candidates}, message: ${_this.message})';
+  return 'Analysis(id: ${_this.id}, status: ${_this.status}, poolStatus: ${_this.poolStatus}, error: ${_this.error}, createdAt: ${_this.createdAt}, candidates: ${_this.candidates}, message: ${_this.message}, progress: ${_this.progress})';
 }
 
 
@@ -369,7 +369,7 @@ abstract mixin class $AnalysisCopyWith<$Res>  {
   factory $AnalysisCopyWith(Analysis value, $Res Function(Analysis) _then) = _$AnalysisCopyWithImpl;
 @useResult
 $Res call({
- String id, String status,@JsonKey(name: 'pool_status') String? poolStatus, String? error,@JsonKey(name: 'created_at') String createdAt, List<Candidate> candidates, String? message
+ String id, String status,@JsonKey(name: 'pool_status') String? poolStatus, String? error,@JsonKey(name: 'created_at') String createdAt, List<Candidate> candidates, String? message, Map<String, dynamic>? progress
 });
 
 
@@ -386,7 +386,7 @@ class _$AnalysisCopyWithImpl<$Res>
 
 /// Create a copy of Analysis
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? status = null,Object? poolStatus = freezed,Object? error = freezed,Object? createdAt = null,Object? candidates = null,Object? message = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? status = null,Object? poolStatus = freezed,Object? error = freezed,Object? createdAt = null,Object? candidates = null,Object? message = freezed,Object? progress = freezed,}) {
   return _then(Analysis(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
@@ -395,7 +395,8 @@ as String?,error: freezed == error ? _self.error : error // ignore: cast_nullabl
 as String?,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
 as String,candidates: null == candidates ? _self.candidates : candidates // ignore: cast_nullable_to_non_nullable
 as List<Candidate>,message: freezed == message ? _self.message : message // ignore: cast_nullable_to_non_nullable
-as String?,
+as String?,progress: freezed == progress ? _self.progress : progress // ignore: cast_nullable_to_non_nullable
+as Map<String, dynamic>?,
   ));
 }
 
@@ -480,10 +481,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String status, @JsonKey(name: 'pool_status')  String? poolStatus,  String? error, @JsonKey(name: 'created_at')  String createdAt,  List<Candidate> candidates,  String? message)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String status, @JsonKey(name: 'pool_status')  String? poolStatus,  String? error, @JsonKey(name: 'created_at')  String createdAt,  List<Candidate> candidates,  String? message,  Map<String, dynamic>? progress)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Analysis() when $default != null:
-return $default(_that.id,_that.status,_that.poolStatus,_that.error,_that.createdAt,_that.candidates,_that.message);case _:
+return $default(_that.id,_that.status,_that.poolStatus,_that.error,_that.createdAt,_that.candidates,_that.message,_that.progress);case _:
   return orElse();
 
 }
@@ -501,10 +502,10 @@ return $default(_that.id,_that.status,_that.poolStatus,_that.error,_that.created
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String status, @JsonKey(name: 'pool_status')  String? poolStatus,  String? error, @JsonKey(name: 'created_at')  String createdAt,  List<Candidate> candidates,  String? message)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String status, @JsonKey(name: 'pool_status')  String? poolStatus,  String? error, @JsonKey(name: 'created_at')  String createdAt,  List<Candidate> candidates,  String? message,  Map<String, dynamic>? progress)  $default,) {final _that = this;
 switch (_that) {
 case _Analysis():
-return $default(_that.id,_that.status,_that.poolStatus,_that.error,_that.createdAt,_that.candidates,_that.message);case _:
+return $default(_that.id,_that.status,_that.poolStatus,_that.error,_that.createdAt,_that.candidates,_that.message,_that.progress);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -521,10 +522,10 @@ return $default(_that.id,_that.status,_that.poolStatus,_that.error,_that.created
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String status, @JsonKey(name: 'pool_status')  String? poolStatus,  String? error, @JsonKey(name: 'created_at')  String createdAt,  List<Candidate> candidates,  String? message)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String status, @JsonKey(name: 'pool_status')  String? poolStatus,  String? error, @JsonKey(name: 'created_at')  String createdAt,  List<Candidate> candidates,  String? message,  Map<String, dynamic>? progress)?  $default,) {final _that = this;
 switch (_that) {
 case _Analysis() when $default != null:
-return $default(_that.id,_that.status,_that.poolStatus,_that.error,_that.createdAt,_that.candidates,_that.message);case _:
+return $default(_that.id,_that.status,_that.poolStatus,_that.error,_that.createdAt,_that.candidates,_that.message,_that.progress);case _:
   return null;
 
 }
@@ -536,7 +537,7 @@ return $default(_that.id,_that.status,_that.poolStatus,_that.error,_that.created
 @JsonSerializable()
 
 class _Analysis implements Analysis {
-  const _Analysis({required this.id, required this.status, @JsonKey(name: 'pool_status') this.poolStatus, this.error, @JsonKey(name: 'created_at') required this.createdAt,  List<Candidate> candidates = const <Candidate>[], this.message}): _candidates = candidates;
+  const _Analysis({required this.id, required this.status, @JsonKey(name: 'pool_status') this.poolStatus, this.error, @JsonKey(name: 'created_at') required this.createdAt,  List<Candidate> candidates = const <Candidate>[], this.message,  Map<String, dynamic>? progress}): _candidates = candidates,_progress = progress;
   factory _Analysis.fromJson(Map<String, dynamic> json) => _$AnalysisFromJson(json);
 
 @override final  String id;
@@ -552,6 +553,15 @@ class _Analysis implements Analysis {
 }
 
 @override final  String? message;
+ final  Map<String, dynamic>? _progress;
+@override Map<String, dynamic>? get progress {
+  final value = _progress;
+  if (value == null) return null;
+  if (_progress is EqualUnmodifiableMapView) return _progress;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableMapView(value);
+}
+
 
 /// Create a copy of Analysis
 /// with the given fields replaced by the non-null parameter values.
@@ -566,18 +576,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _Analysis&&(identical(other.id, id) || other.id == id)&&(identical(other.status, status) || other.status == status)&&(identical(other.poolStatus, poolStatus) || other.poolStatus == poolStatus)&&(identical(other.error, error) || other.error == error)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&const DeepCollectionEquality().equals(other.candidates, _candidates)&&(identical(other.message, message) || other.message == message));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _Analysis&&(identical(other.id, id) || other.id == id)&&(identical(other.status, status) || other.status == status)&&(identical(other.poolStatus, poolStatus) || other.poolStatus == poolStatus)&&(identical(other.error, error) || other.error == error)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&const DeepCollectionEquality().equals(other.candidates, _candidates)&&(identical(other.message, message) || other.message == message)&&const DeepCollectionEquality().equals(other.progress, _progress));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
-    return Object.hash(runtimeType,id,status,poolStatus,error,createdAt,const DeepCollectionEquality().hash(_candidates),message);
+    return Object.hash(runtimeType,id,status,poolStatus,error,createdAt,const DeepCollectionEquality().hash(_candidates),message,const DeepCollectionEquality().hash(_progress));
 }
 
 @override
 String toString() {
-    return 'Analysis(id: $id, status: $status, poolStatus: $poolStatus, error: $error, createdAt: $createdAt, candidates: $candidates, message: $message)';
+    return 'Analysis(id: $id, status: $status, poolStatus: $poolStatus, error: $error, createdAt: $createdAt, candidates: $candidates, message: $message, progress: $progress)';
 }
 
 
@@ -588,7 +598,7 @@ abstract mixin class _$AnalysisCopyWith<$Res> implements $AnalysisCopyWith<$Res>
   factory _$AnalysisCopyWith(_Analysis value, $Res Function(_Analysis) _then) = __$AnalysisCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String status,@JsonKey(name: 'pool_status') String? poolStatus, String? error,@JsonKey(name: 'created_at') String createdAt, List<Candidate> candidates, String? message
+ String id, String status,@JsonKey(name: 'pool_status') String? poolStatus, String? error,@JsonKey(name: 'created_at') String createdAt, List<Candidate> candidates, String? message, Map<String, dynamic>? progress
 });
 
 
@@ -605,7 +615,7 @@ class __$AnalysisCopyWithImpl<$Res>
 
 /// Create a copy of Analysis
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? status = null,Object? poolStatus = freezed,Object? error = freezed,Object? createdAt = null,Object? candidates = null,Object? message = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? status = null,Object? poolStatus = freezed,Object? error = freezed,Object? createdAt = null,Object? candidates = null,Object? message = freezed,Object? progress = freezed,}) {
   return _then(_Analysis(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
@@ -614,7 +624,8 @@ as String?,error: freezed == error ? _self.error : error // ignore: cast_nullabl
 as String?,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
 as String,candidates: null == candidates ? _self._candidates : candidates // ignore: cast_nullable_to_non_nullable
 as List<Candidate>,message: freezed == message ? _self.message : message // ignore: cast_nullable_to_non_nullable
-as String?,
+as String?,progress: freezed == progress ? _self._progress : progress // ignore: cast_nullable_to_non_nullable
+as Map<String, dynamic>?,
   ));
 }
 

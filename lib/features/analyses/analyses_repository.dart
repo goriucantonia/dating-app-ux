@@ -46,6 +46,25 @@ class AnalysesRepository {
     }
   }
 
+  /// Start the simulated dates for a matched analysis (S11-B11).
+  ///
+  /// A 409 here is the same shape of thing as `start()`'s: the dates are
+  /// already running, which is not an error to show but a reason to go and
+  /// watch them.
+  Future<void> simulate(String id) async {
+    try {
+      await _dio.post<Map<String, dynamic>>('/analyses/$id/simulate');
+    } on DioException catch (e) {
+      final body = e.response?.data;
+      if (e.response?.statusCode == 409 &&
+          body is Map<String, dynamic> &&
+          (body['error'] as Map?)?['code'] == 'simulation_in_progress') {
+        return;
+      }
+      throw ApiException.from(e);
+    }
+  }
+
   Future<List<Analysis>> history() async {
     try {
       final r = await _dio.get<Map<String, dynamic>>('/analyses');

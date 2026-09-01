@@ -7,6 +7,7 @@ import '../../core/api/api_client.dart';
 import '../../core/polling/poller.dart';
 import '../common/demo_chip.dart';
 import '../traits/models.dart' show traitCategoryLabels, traitCategoryOrder;
+import 'analyses_repository.dart';
 import 'models.dart';
 
 /// `/analyses/:id` — **ONE route, phase-switched by status** (S10-U7).
@@ -54,10 +55,17 @@ class AnalysisScreen extends ConsumerWidget {
                 subtitle: 'Comparing you with everyone who is open to matching.',
                 spinner: true,
               ),
-            'simulating' => const _Phase(
+            // S11-B10: the subtitle is the SERVER's sentence, naming the real
+            // stage — "Simulating date 2 of 6 — at the car meet…". Never a
+            // fake timer and never a stage name invented on this side, so
+            // what the user reads is what the pipeline is actually doing.
+            'simulating' => _Phase(
                 icon: Icons.movie_filter,
                 title: 'Running the dates…',
-                subtitle: 'This arrives properly in a later build step.',
+                subtitle: analysis.progress?['message'] as String? ??
+                    'Getting the first date started.',
+                footnote: 'This takes a while. You can close the app — '
+                    'it keeps going without you.',
                 spinner: true,
               ),
             // S10-U6 / U10: honest, calm, and with NO simulate button.
@@ -131,16 +139,23 @@ class _Reveal extends StatelessWidget {
         const SizedBox(height: 20),
         // S10-U12: an explicit button, NOT auto-chained. The reveal is a
         // decision point — the user looks at who was found and chooses.
-        FilledButton.icon(
-          onPressed: null,
-          icon: const Icon(Icons.play_arrow),
-          label: const Text('Start Simulated Dates'),
-        ),
-        const SizedBox(height: 6),
-        Center(
-          child: Text('Simulated dates arrive in the next build step.',
-              style: theme.textTheme.bodySmall),
-        ),
+        //
+        // Only on `matched`. A finished analysis renders this same reveal, and
+        // offering it a live "Start Simulated Dates" button would be offering
+        // an action the server answers with a 409 every time — a button that
+        // can only ever fail is worse than no button (§11: gate the promise on
+        // the capability).
+        if (analysis.status == 'matched')
+          _SimulateButton(analysisId: analysis.id)
+        else
+          Center(
+            child: Text(
+              'These dates have already run. Reading them back arrives in the '
+              'next build step.',
+              textAlign: TextAlign.center,
+              style: theme.textTheme.bodySmall,
+            ),
+          ),
         const SizedBox(height: 32),
       ],
     );
@@ -422,6 +437,78 @@ class _ErrorRetry extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+/// The one control that turns a list of names into six simulated evenings
+/// (S11-B11).
+///
+/// Stateful for one reason: between the tap and the server's 202 there are a
+/// few seconds where the poller still reports `matched`, and a button that
+/// looks untouched in that window gets pressed twice. The local `_starting`
+/// flag covers exactly that gap and nothing else — the moment the poller sees
+/// `simulating`, the whole screen switches phase and this widget is gone.
+class _SimulateButton extends ConsumerStatefulWidget {
+  const _SimulateButton({required this.analysisId});
+
+  final String analysisId;
+
+  @override
+  ConsumerState<_SimulateButton> createState() => _SimulateButtonState();
+}
+
+class _SimulateButtonState extends ConsumerState<_SimulateButton> {
+  bool _starting = false;
+
+  Future<void> _start() async {
+    setState(() => _starting = true);
+    try {
+      await ref.read(analysesRepositoryProvider).simulate(widget.analysisId);
+      await ref
+          .read(analysisPollerProvider(widget.analysisId).notifier)
+          .refreshNow();
+    } catch (e) {
+      // D-005: a submit that fails must SAY so. Catching only ApiException
+      // here would leave a storage- or transport-level failure showing the
+      // user a button that quietly went back to normal.
+      if (!mounted) return;
+      setState(() => _starting = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(e is ApiException
+              ? e.message
+              : "Couldn't start the dates just now. Try again in a moment."),
+        ),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Column(
+      children: [
+        FilledButton.icon(
+          onPressed: _starting ? null : _start,
+          icon: _starting
+              ? const SizedBox(
+                  width: 18,
+                  height: 18,
+                  child: CircularProgressIndicator(strokeWidth: 2))
+              : const Icon(Icons.play_arrow),
+          label: Text(_starting ? 'Starting…' : 'Start Simulated Dates'),
+        ),
+        const SizedBox(height: 6),
+        Center(
+          child: Text(
+            'Two dates with each person. It takes a while, and it keeps '
+            'running whether you watch or not.',
+            textAlign: TextAlign.center,
+            style: theme.textTheme.bodySmall,
+          ),
+        ),
+      ],
     );
   }
 }

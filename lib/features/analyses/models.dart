@@ -42,6 +42,12 @@ abstract class Analysis with _$Analysis {
     @JsonKey(name: 'created_at') required String createdAt,
     @Default(<Candidate>[]) List<Candidate> candidates,
     String? message,
+    // The simulation pipeline's real stage, in the sentence the server wrote
+    // (S11-B10). Deliberately untyped: the stage NAMES are the server's to
+    // add to, and a client that models them as an enum starts crashing the
+    // day the pipeline grows a stage. The UI reads `message` and treats
+    // anything it does not recognise as "still working".
+    Map<String, dynamic>? progress,
   }) = _Analysis;
 
   factory Analysis.fromJson(Map<String, dynamic> json) =>
