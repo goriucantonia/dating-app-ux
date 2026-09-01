@@ -12,14 +12,16 @@ const voiceNudge =
     "Write at least 4–5 sentences, the way you'd actually say it. "
     'The AI learns your voice from how you write here.';
 
-const _minChars = 200;
+// Owner decision, 2026-09-01: lowered from 200. The server CHECK and the
+// pydantic min_length move with it — this is the display half of one rule.
+const _minChars = 50;
 
 /// THE one-question-per-page answering widget (S5-U1/U2), used by onboarding,
 /// pool expansion, and the single-answer editor — the same widget, the same
 /// autosave, by decision (§16: not a second implementation).
 ///
 /// Autosave fires on page advance AND on a 2-second idle debounce once the
-/// answer passes 200 characters (under the minimum there is nothing the
+/// answer passes 50 characters (under the minimum there is nothing the
 /// server would accept). Named trade: a few extra PUTs beat a save button
 /// users forget.
 class AnswerFlow extends ConsumerStatefulWidget {
@@ -154,7 +156,7 @@ class _AnswerFlowState extends ConsumerState<AnswerFlow> {
             Expanded(
               child: Text(voiceNudge, style: theme.textTheme.bodySmall),
             ),
-            // Muted below the minimum, confirmed at 200 (S5-U1).
+            // Muted below the minimum, confirmed at 50 (S5-U1).
             Text(
               enough ? '$length / $_minChars ✓' : '$length / $_minChars',
               style: theme.textTheme.labelMedium!.copyWith(

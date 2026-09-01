@@ -18,7 +18,7 @@ Status: planning locked 2026-09-01. Server counterpart: `module_1_data_collectio
 - Before the questionnaire starts, one interstitial states the deal plainly: "5 questions, about 10 minutes. Write like you talk — the AI learns your voice from this. Nothing works without it."
 
 ### `/onboarding/questions`
-- One question per page, `1 of 5` progress. Large multiline field, character counter that turns from muted to confirmed at 200 chars (server minimum), with the nudge text from A2 under the field.
+- One question per page, `1 of 5` progress. Large multiline field, character counter that turns from muted to confirmed at 50 chars (server minimum; owner decision 2026-09-01, was 200), with the nudge text from A2 under the field.
 - **Save per answer:** `PUT /answers/{question_id}` fires on page advance *and* on a 2-second idle debounce, so closing the app mid-sentence loses at most a couple of words. Resume: `GET /questions` drives "first unanswered question" on return; the route guard (in `ux_architecture.md`) sends any signed-in user with unanswered baseline questions here.
 - After BQ5: a single "Building your profile…" screen calls `POST /profile/extract` then `POST /persona/compile`, polling snapshot status; lands on `/profile` with traits visible. Extraction failure → error state with retry — the answers are safe, only the processing is retried.
 
