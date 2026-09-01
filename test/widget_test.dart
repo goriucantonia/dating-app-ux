@@ -1,27 +1,26 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:dating_app_ux/app/app.dart';
-import 'package:dating_app_ux/features/debug/health_screen.dart';
+import 'package:dating_app_ux/core/auth/auth_controller.dart';
+import 'package:dating_app_ux/features/auth/models.dart';
+
+class _SignedOut extends AuthController {
+  @override
+  Future<User?> build() async => null;
+}
 
 void main() {
-  testWidgets('app builds and shows the debug health screen', (tester) async {
-    // The real network call is Step 1's acceptance criterion on the running
-    // stack; the widget test only proves the shell renders the payload.
+  testWidgets('signed-out app lands on the login screen (the one guard)',
+      (tester) async {
     await tester.pumpWidget(
       ProviderScope(
-        overrides: [
-          healthProvider.overrideWith(
-            (ref) async => {'status': 'ok', 'database': 'connected'},
-          ),
-        ],
+        overrides: [authControllerProvider.overrideWith(_SignedOut.new)],
         child: const App(),
       ),
     );
     await tester.pumpAndSettle();
-    expect(find.byType(MaterialApp), findsOneWidget);
-    expect(find.text('Server health (debug)'), findsOneWidget);
-    expect(find.textContaining('connected'), findsOneWidget);
+    expect(find.text('Sign in'), findsWidgets);
+    expect(find.text('New here? Create an account'), findsOneWidget);
   });
 }
