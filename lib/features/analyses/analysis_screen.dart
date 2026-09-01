@@ -502,7 +502,7 @@ class _SimulateButtonState extends ConsumerState<_SimulateButton> {
         const SizedBox(height: 6),
         Center(
           child: Text(
-            'Two dates with each person. It takes a while, and it keeps '
+            'One date with each person. It takes a while, and it keeps '
             'running whether you watch or not.',
             textAlign: TextAlign.center,
             style: theme.textTheme.bodySmall,
