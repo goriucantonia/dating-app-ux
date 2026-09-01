@@ -48,6 +48,12 @@ class HomeScreen extends ConsumerWidget {
                               'Looking for ${user.interestedIn.join(", ")} · ${user.agePrefMin}–${user.agePrefMax}'),
                           Text('Open to matching: ${user.optIn ? "yes" : "no"}'),
                           const SizedBox(height: 16),
+                          FilledButton.icon(
+                            onPressed: () => context.go('/profile'),
+                            icon: const Icon(Icons.person),
+                            label: const Text('Your profile'),
+                          ),
+                          const SizedBox(height: 8),
                           FilledButton.tonalIcon(
                             onPressed: () => context.go('/profile/expand'),
                             icon: const Icon(Icons.add_comment),

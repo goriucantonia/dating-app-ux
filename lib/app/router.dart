@@ -8,6 +8,9 @@ import '../features/auth/register_screen.dart';
 import '../features/home/home_screen.dart';
 import '../features/questions/expand_screen.dart';
 import '../features/persona/building_screen.dart';
+import '../features/settings/settings_screen.dart';
+import '../features/traits/calibration_screen.dart';
+import '../features/traits/profile_screen.dart';
 import '../features/questions/onboarding_screen.dart';
 import '../features/questions/questions_providers.dart';
 
@@ -60,8 +63,13 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
           path: '/onboarding/building',
           builder: (_, _) => const BuildingScreen()),
+      GoRoute(path: '/profile', builder: (_, _) => const ProfileScreen()),
+      GoRoute(
+          path: '/profile/calibration',
+          builder: (_, _) => const CalibrationScreen()),
       GoRoute(
           path: '/profile/expand', builder: (_, _) => const ExpandScreen()),
+      GoRoute(path: '/settings', builder: (_, _) => const SettingsScreen()),
     ],
   );
 });

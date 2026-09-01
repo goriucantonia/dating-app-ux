@@ -42,6 +42,13 @@ class AuthController extends AsyncNotifier<User?> {
     state = const AsyncData(null);
   }
 
+  /// Adopt a user the server has just returned (PATCH /me). No second GET:
+  /// the PATCH response IS the new truth, and auth state stays owned by this
+  /// one class rather than being written from a settings screen (§16).
+  void adopt(User user) {
+    state = AsyncData(user);
+  }
+
   /// Called by the ONE dio interceptor on any 401 — the session is dead.
   void sessionExpired() {
     ref.read(tokenStoreProvider).clear();
