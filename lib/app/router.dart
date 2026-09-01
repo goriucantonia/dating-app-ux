@@ -7,6 +7,7 @@ import '../features/auth/login_screen.dart';
 import '../features/auth/register_screen.dart';
 import '../features/home/home_screen.dart';
 import '../features/questions/expand_screen.dart';
+import '../features/analyses/analysis_screen.dart';
 import '../features/persona/building_screen.dart';
 import '../features/settings/settings_screen.dart';
 import '../features/traits/calibration_screen.dart';
@@ -70,6 +71,13 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
           path: '/profile/expand', builder: (_, _) => const ExpandScreen()),
       GoRoute(path: '/settings', builder: (_, _) => const SettingsScreen()),
+      // S10-U7/U13: ONE route, phase-switched by the analysis status, so a
+      // deep link lands correctly whatever phase the run is in.
+      GoRoute(
+        path: '/analyses/:id',
+        builder: (_, state) =>
+            AnalysisScreen(analysisId: state.pathParameters['id']!),
+      ),
     ],
   );
 });

@@ -30,6 +30,11 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  # Declared because main.dart imports it for usePathUrlStrategy(). It ships
+  # with the SDK, so the build worked without this line — but the analyzer is
+  # right that an undeclared import is a dependency nobody can see.
+  flutter_web_plugins:
+    sdk: flutter
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
