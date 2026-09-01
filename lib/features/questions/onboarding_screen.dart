@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../app/layout_shell.dart';
 import 'answer_flow.dart';
@@ -52,7 +53,13 @@ class _OnboardingQuestionsScreenState
               questions: unanswered,
               progressOffset: answeredCount,
               progressTotal: baseline.length,
-              onFinished: () => ref.invalidate(questionsProvider),
+              // S7-U1: the last answer hands straight over to the
+              // extract -> compile chain rather than dropping the user on a
+              // home screen that has nothing for them yet.
+              onFinished: () {
+                ref.invalidate(questionsProvider);
+                context.go('/onboarding/building');
+              },
             );
           },
         ),

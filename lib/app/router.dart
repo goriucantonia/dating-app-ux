@@ -7,6 +7,7 @@ import '../features/auth/login_screen.dart';
 import '../features/auth/register_screen.dart';
 import '../features/home/home_screen.dart';
 import '../features/questions/expand_screen.dart';
+import '../features/persona/building_screen.dart';
 import '../features/questions/onboarding_screen.dart';
 import '../features/questions/questions_providers.dart';
 
@@ -35,7 +36,13 @@ final routerProvider = Provider<GoRouter>((ref) {
 
       // Guard 2 — null means "not known yet": never bounce on a guess.
       final incomplete = baselineIncomplete(ref.read(questionsProvider));
-      if (incomplete == true && location != '/onboarding/questions') {
+      // The building screen is the step immediately AFTER the last answer.
+      // It must be reachable while the provider still reports the old
+      // "incomplete" value, or the guard would bounce the user back to a
+      // questionnaire they just finished.
+      if (incomplete == true &&
+          location != '/onboarding/questions' &&
+          location != '/onboarding/building') {
         return '/onboarding/questions';
       }
       if (incomplete == false && location == '/onboarding/questions') {
@@ -50,6 +57,9 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
           path: '/onboarding/questions',
           builder: (_, _) => const OnboardingQuestionsScreen()),
+      GoRoute(
+          path: '/onboarding/building',
+          builder: (_, _) => const BuildingScreen()),
       GoRoute(
           path: '/profile/expand', builder: (_, _) => const ExpandScreen()),
     ],
