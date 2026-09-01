@@ -24,6 +24,13 @@ Status: planning locked 2026-09-01. Server counterpart: `chat.md`. Final UX modu
 - History pages backward via `?after_seq=` on scroll-up; the session provider holds the merged list.
 - Send is strictly sequential per session (composer disabled while a reply is pending) — matches the server's request–response turn model; no optimistic bubbles for the persona side, the user bubble renders immediately.
 
+## 2a. Built 2026-09-01 (Step 14) — decisions made while building, inline
+
+- **History loads every page on open** rather than paging backward on scroll-up. Chats at friends scale are small, the wire is the same `?after_seq=` contract, and a scroll-up paginator is the kind of plumbing that breaks silently. Revisit if a chat outgrows a few hundred messages.
+- **On a failed send the user's bubble is withdrawn, an in-thread notice says exactly what the server said, and the text goes back into the composer marked "Not sent yet".** The server rolls its copy back too (`chat.md`), so the retry is a clean re-send, never a double post.
+- **The shared chat widget gained three parameters, not branches:** `typingLabel` (the typing indicator), `composerEnabled` (an ended chat keeps its history and loses its composer), and `ChatBubble.isError` (a centred notice that can never be mistaken for a spoken line). Calibration passes none of them and is unchanged.
+- **The selection footer reads the session list to render "already chose [name]"** — one provider (`selectionForAnalysisProvider`) derives it, so the results screen and the chat list cannot disagree about whether a choice was made.
+
 ## 3. Decisions (trades named)
 
 1. **Confirm sheet before selection.** Cost: one extra tap on the app's climactic action. Accepted: it's the one irreversible choice in an analysis, and it's where the not-notified honesty must land — after this, the app behaves as if a relationship exists.

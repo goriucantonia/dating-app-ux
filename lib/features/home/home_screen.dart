@@ -28,6 +28,11 @@ class HomeScreen extends ConsumerWidget {
         title: const Text('Dating App AI'),
         actions: [
           IconButton(
+            tooltip: 'Your chats',
+            icon: const Icon(Icons.forum_outlined),
+            onPressed: () => context.go('/chat'),
+          ),
+          IconButton(
             tooltip: 'Your profile',
             icon: const Icon(Icons.person),
             onPressed: () => context.go('/profile'),

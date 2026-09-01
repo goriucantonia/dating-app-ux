@@ -5,6 +5,8 @@ import 'package:go_router/go_router.dart';
 import '../core/auth/auth_controller.dart';
 import '../features/auth/login_screen.dart';
 import '../features/auth/register_screen.dart';
+import '../features/chat/chat_list_screen.dart';
+import '../features/chat/chat_screen.dart';
 import '../features/home/home_screen.dart';
 import '../features/questions/expand_screen.dart';
 import '../features/analyses/analysis_screen.dart';
@@ -87,6 +89,13 @@ final routerProvider = Provider<GoRouter>((ref) {
                 ResultsScreen(analysisId: state.pathParameters['id']!),
           ),
         ],
+      ),
+      // S14-U3/U4: the session list and the live chat.
+      GoRoute(path: '/chat', builder: (_, _) => const ChatListScreen()),
+      GoRoute(
+        path: '/chat/:sessionId',
+        builder: (_, state) =>
+            ChatScreen(sessionId: state.pathParameters['sessionId']!),
       ),
       // S13-U6/U9: the transcript viewer, with `?seq=` as its anchor.
       GoRoute(

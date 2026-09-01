@@ -6,6 +6,7 @@ import '../../app/layout_shell.dart';
 import '../../core/api/api_client.dart';
 import '../../core/polling/poller.dart';
 import '../analyses/models.dart';
+import '../chat/chat_repository.dart';
 import '../common/demo_chip.dart';
 import 'curves.dart';
 import 'date_checklist.dart';
@@ -153,16 +154,9 @@ class _Body extends StatelessWidget {
                 textAlign: TextAlign.center, style: theme.textTheme.bodyMedium),
           ),
         const SizedBox(height: 24),
-        // The footer Step 14 owns (chat_selection.md): the selection control
-        // lands here. Named rather than hidden, so the space is not read as
-        // "the end".
-        Center(
-          child: Text(
-            'Choosing one of them to chat with arrives in the next build step.',
-            textAlign: TextAlign.center,
-            style: theme.textTheme.bodySmall,
-          ),
-        ),
+        // The footer chat_selection.md owns (S14-U1/U2).
+        if (a.status == 'complete' && ranked.isNotEmpty)
+          SelectionFooter(analysis: a, candidates: ranked),
         const SizedBox(height: 32),
       ],
     );
@@ -708,6 +702,162 @@ class _ErrorRetry extends StatelessWidget {
             Text(message, textAlign: TextAlign.center),
             const SizedBox(height: 16),
             FilledButton(onPressed: onRetry, child: const Text('Try again')),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// The Ultimate Match Selection control (S14-U1, U2 — `chat_selection.md`).
+///
+/// "Choose [name]" per candidate. The confirm sheet states the deal in two
+/// lines, because this is where the not-notified honesty has to land: after
+/// this tap the app behaves as if a relationship exists. Named trade: one
+/// extra tap on the climactic action.
+///
+/// After selecting, the other candidates' buttons become "already chose
+/// [name]" — **visible, not hidden**, so the one-per-analysis rule is
+/// legible rather than mysterious.
+class SelectionFooter extends ConsumerStatefulWidget {
+  const SelectionFooter({super.key, required this.analysis, required this.candidates});
+
+  final Analysis analysis;
+  final List<Candidate> candidates;
+
+  @override
+  ConsumerState<SelectionFooter> createState() => _SelectionFooterState();
+}
+
+class _SelectionFooterState extends ConsumerState<SelectionFooter> {
+  bool _busy = false;
+
+  Future<void> _choose(Candidate c) async {
+    final name = c.displayName;
+    final ok = await showModalBottomSheet<bool>(
+      context: context,
+      builder: (ctx) => Padding(
+        padding: const EdgeInsets.fromLTRB(20, 20, 20, 28),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Choose $name?', style: Theme.of(ctx).textTheme.titleLarge),
+            const SizedBox(height: 12),
+            Text(
+              "You'll chat with an AI version of $name that remembers your "
+              'simulated dates.',
+              style: Theme.of(ctx).textTheme.bodyMedium,
+            ),
+            const SizedBox(height: 6),
+            Text(
+              "$name won't be notified — real conversations aren't part of "
+              'this phase.',
+              style: Theme.of(ctx).textTheme.bodyMedium,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'One choice per analysis. You can always run a new analysis later.',
+              style: Theme.of(ctx).textTheme.bodySmall,
+            ),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                TextButton(
+                  onPressed: () => Navigator.of(ctx).pop(false),
+                  child: const Text('Not now'),
+                ),
+                const Spacer(),
+                FilledButton(
+                  onPressed: () => Navigator.of(ctx).pop(true),
+                  child: Text('Choose $name'),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+    if (ok != true || !mounted) return;
+
+    setState(() => _busy = true);
+    final messenger = ScaffoldMessenger.of(context);
+    final router = GoRouter.of(context);
+    try {
+      final session = await ref
+          .read(chatRepositoryProvider)
+          .select(widget.analysis.id, c.candidateUserId);
+      ref.invalidate(chatSessionsProvider);
+      router.push('/chat/${session.sessionId}');
+    } on AlreadySelected catch (e) {
+      // State, not failure: go to the chat that already exists.
+      ref.invalidate(chatSessionsProvider);
+      if (e.sessionId != null) router.push('/chat/${e.sessionId}');
+    } on ApiException catch (e) {
+      messenger.showSnackBar(SnackBar(content: Text(e.message)));
+    } catch (e) {
+      // Every submit ends in a visible outcome (D-005).
+      messenger.showSnackBar(SnackBar(content: Text('$e')));
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final chosen = ref.watch(selectionForAnalysisProvider(widget.analysis.id));
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Choose one to talk to', style: theme.textTheme.titleMedium),
+            const SizedBox(height: 4),
+            Text(
+              chosen == null
+                  ? 'You get one choice per analysis. The chat is with an AI '
+                      'version of them — they won’t be told.'
+                  : 'You chose ${chosen.match.displayName} from this analysis.',
+              style: theme.textTheme.bodySmall,
+            ),
+            const SizedBox(height: 12),
+            for (final c in widget.candidates)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Row(
+                        children: [
+                          Flexible(
+                            child: Text(c.displayName,
+                                style: theme.textTheme.bodyLarge),
+                          ),
+                          DemoChip(isDemo: c.isDemo, compact: true),
+                        ],
+                      ),
+                    ),
+                    if (chosen == null)
+                      FilledButton(
+                        onPressed: _busy ? null : () => _choose(c),
+                        child: Text('Choose ${c.displayName}'),
+                      )
+                    else if (chosen.match.userId == c.candidateUserId)
+                      FilledButton.tonal(
+                        onPressed: () => context.push('/chat/${chosen.sessionId}'),
+                        child: const Text('Open the chat'),
+                      )
+                    else
+                      // Visible, disabled, and saying why (S14-U2).
+                      OutlinedButton(
+                        onPressed: null,
+                        child: Text('already chose ${chosen.match.displayName}'),
+                      ),
+                  ],
+                ),
+              ),
           ],
         ),
       ),

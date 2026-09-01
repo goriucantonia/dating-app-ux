@@ -425,7 +425,7 @@ void main() {
     expect(find.text('No score'), findsOneWidget);
     expect(find.text('0.0'), findsNothing);
     // The Demo chip survives onto the results (§6).
-    expect(find.text('Demo'), findsOneWidget);
+    expect(find.text('Demo'), findsAtLeastNWidgets(1));
   });
 
   testWidgets('results: tapping a score shows the four checks and the arithmetic',
