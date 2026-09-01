@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../app/layout_shell.dart';
 import '../../core/auth/auth_controller.dart';
@@ -47,8 +48,14 @@ class HomeScreen extends ConsumerWidget {
                               'Looking for ${user.interestedIn.join(", ")} · ${user.agePrefMin}–${user.agePrefMax}'),
                           Text('Open to matching: ${user.optIn ? "yes" : "no"}'),
                           const SizedBox(height: 16),
+                          FilledButton.tonalIcon(
+                            onPressed: () => context.go('/profile/expand'),
+                            icon: const Icon(Icons.add_comment),
+                            label: const Text('Deepen your profile'),
+                          ),
+                          const SizedBox(height: 8),
                           Text(
-                            'Your 5 onboarding questions arrive in the next build step.',
+                            'Matching arrives in a later build step.',
                             style: Theme.of(context).textTheme.bodySmall,
                           ),
                         ],
