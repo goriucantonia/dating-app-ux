@@ -24,6 +24,9 @@ _Candidate _$CandidateFromJson(Map<String, dynamic> json) => _Candidate(
       .toList(),
   reasonSummary: json['reason_summary'] as String,
   snapshotId: json['snapshot_id'] as String,
+  finalScore: (json['final_score'] as num?)?.toDouble(),
+  datesCompleted: (json['dates_completed'] as num?)?.toInt(),
+  datesIncomplete: (json['dates_incomplete'] as num?)?.toInt(),
 );
 
 Map<String, dynamic> _$CandidateToJson(_Candidate instance) =>
@@ -40,6 +43,9 @@ Map<String, dynamic> _$CandidateToJson(_Candidate instance) =>
       'shared_interests': instance.sharedInterests,
       'reason_summary': instance.reasonSummary,
       'snapshot_id': instance.snapshotId,
+      'final_score': instance.finalScore,
+      'dates_completed': instance.datesCompleted,
+      'dates_incomplete': instance.datesIncomplete,
     };
 
 _Analysis _$AnalysisFromJson(Map<String, dynamic> json) => _Analysis(

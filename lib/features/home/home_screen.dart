@@ -239,7 +239,9 @@ class _RunningCard extends ConsumerWidget {
                     const SizedBox(height: 4),
                     Text(
                       status == 'simulating'
-                          ? 'Running the dates…'
+                          // S13-U1: the server's own stage sentence, here too.
+                          ? (state.valueOrNull?.progress?['message'] as String? ??
+                              'Running the dates…')
                           : 'Checking who fits…',
                       style: theme.textTheme.bodyMedium,
                     ),

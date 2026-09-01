@@ -8,6 +8,8 @@ import '../features/auth/register_screen.dart';
 import '../features/home/home_screen.dart';
 import '../features/questions/expand_screen.dart';
 import '../features/analyses/analysis_screen.dart';
+import '../features/dates/results_screen.dart';
+import '../features/dates/transcript_screen.dart';
 import '../features/persona/building_screen.dart';
 import '../features/settings/settings_screen.dart';
 import '../features/traits/calibration_screen.dart';
@@ -77,6 +79,22 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/analyses/:id',
         builder: (_, state) =>
             AnalysisScreen(analysisId: state.pathParameters['id']!),
+        routes: [
+          // S13-U10: the results dashboard.
+          GoRoute(
+            path: 'results',
+            builder: (_, state) =>
+                ResultsScreen(analysisId: state.pathParameters['id']!),
+          ),
+        ],
+      ),
+      // S13-U6/U9: the transcript viewer, with `?seq=` as its anchor.
+      GoRoute(
+        path: '/dates/:id',
+        builder: (_, state) => TranscriptScreen(
+          dateId: state.pathParameters['id']!,
+          anchorSeq: int.tryParse(state.uri.queryParameters['seq'] ?? ''),
+        ),
       ),
     ],
   );

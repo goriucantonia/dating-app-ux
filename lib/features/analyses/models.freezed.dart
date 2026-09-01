@@ -16,7 +16,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$Candidate {
 
-@JsonKey(name: 'candidate_user_id') String get candidateUserId;@JsonKey(name: 'display_name') String get displayName; int get age;@JsonKey(name: 'is_demo') bool get isDemo;@JsonKey(name: 'trait_labels') Map<String, List<String>> get traitLabels; int get rank;@JsonKey(name: 'fit_forward') double get fitForward;@JsonKey(name: 'fit_backward') double get fitBackward; double get compatibility;@JsonKey(name: 'shared_interests') List<String> get sharedInterests;@JsonKey(name: 'reason_summary') String get reasonSummary;@JsonKey(name: 'snapshot_id') String get snapshotId;
+@JsonKey(name: 'candidate_user_id') String get candidateUserId;@JsonKey(name: 'display_name') String get displayName; int get age;@JsonKey(name: 'is_demo') bool get isDemo;@JsonKey(name: 'trait_labels') Map<String, List<String>> get traitLabels; int get rank;@JsonKey(name: 'fit_forward') double get fitForward;@JsonKey(name: 'fit_backward') double get fitBackward; double get compatibility;@JsonKey(name: 'shared_interests') List<String> get sharedInterests;@JsonKey(name: 'reason_summary') String get reasonSummary;@JsonKey(name: 'snapshot_id') String get snapshotId;@JsonKey(name: 'final_score') double? get finalScore;@JsonKey(name: 'dates_completed') int? get datesCompleted;@JsonKey(name: 'dates_incomplete') int? get datesIncomplete;
 /// Create a copy of Candidate
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -30,20 +30,20 @@ $CandidateCopyWith<Candidate> get copyWith => _$CandidateCopyWithImpl<Candidate>
 @override
 bool operator ==(Object other) {
   final _this = this as Candidate;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Candidate&&(identical(other.candidateUserId, _this.candidateUserId) || other.candidateUserId == _this.candidateUserId)&&(identical(other.displayName, _this.displayName) || other.displayName == _this.displayName)&&(identical(other.age, _this.age) || other.age == _this.age)&&(identical(other.isDemo, _this.isDemo) || other.isDemo == _this.isDemo)&&const DeepCollectionEquality().equals(other.traitLabels, _this.traitLabels)&&(identical(other.rank, _this.rank) || other.rank == _this.rank)&&(identical(other.fitForward, _this.fitForward) || other.fitForward == _this.fitForward)&&(identical(other.fitBackward, _this.fitBackward) || other.fitBackward == _this.fitBackward)&&(identical(other.compatibility, _this.compatibility) || other.compatibility == _this.compatibility)&&const DeepCollectionEquality().equals(other.sharedInterests, _this.sharedInterests)&&(identical(other.reasonSummary, _this.reasonSummary) || other.reasonSummary == _this.reasonSummary)&&(identical(other.snapshotId, _this.snapshotId) || other.snapshotId == _this.snapshotId));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Candidate&&(identical(other.candidateUserId, _this.candidateUserId) || other.candidateUserId == _this.candidateUserId)&&(identical(other.displayName, _this.displayName) || other.displayName == _this.displayName)&&(identical(other.age, _this.age) || other.age == _this.age)&&(identical(other.isDemo, _this.isDemo) || other.isDemo == _this.isDemo)&&const DeepCollectionEquality().equals(other.traitLabels, _this.traitLabels)&&(identical(other.rank, _this.rank) || other.rank == _this.rank)&&(identical(other.fitForward, _this.fitForward) || other.fitForward == _this.fitForward)&&(identical(other.fitBackward, _this.fitBackward) || other.fitBackward == _this.fitBackward)&&(identical(other.compatibility, _this.compatibility) || other.compatibility == _this.compatibility)&&const DeepCollectionEquality().equals(other.sharedInterests, _this.sharedInterests)&&(identical(other.reasonSummary, _this.reasonSummary) || other.reasonSummary == _this.reasonSummary)&&(identical(other.snapshotId, _this.snapshotId) || other.snapshotId == _this.snapshotId)&&(identical(other.finalScore, _this.finalScore) || other.finalScore == _this.finalScore)&&(identical(other.datesCompleted, _this.datesCompleted) || other.datesCompleted == _this.datesCompleted)&&(identical(other.datesIncomplete, _this.datesIncomplete) || other.datesIncomplete == _this.datesIncomplete));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
   final _this = this as Candidate;
-  return Object.hash(runtimeType,_this.candidateUserId,_this.displayName,_this.age,_this.isDemo,const DeepCollectionEquality().hash(_this.traitLabels),_this.rank,_this.fitForward,_this.fitBackward,_this.compatibility,const DeepCollectionEquality().hash(_this.sharedInterests),_this.reasonSummary,_this.snapshotId);
+  return Object.hash(runtimeType,_this.candidateUserId,_this.displayName,_this.age,_this.isDemo,const DeepCollectionEquality().hash(_this.traitLabels),_this.rank,_this.fitForward,_this.fitBackward,_this.compatibility,const DeepCollectionEquality().hash(_this.sharedInterests),_this.reasonSummary,_this.snapshotId,_this.finalScore,_this.datesCompleted,_this.datesIncomplete);
 }
 
 @override
 String toString() {
   final _this = this as Candidate;
-  return 'Candidate(candidateUserId: ${_this.candidateUserId}, displayName: ${_this.displayName}, age: ${_this.age}, isDemo: ${_this.isDemo}, traitLabels: ${_this.traitLabels}, rank: ${_this.rank}, fitForward: ${_this.fitForward}, fitBackward: ${_this.fitBackward}, compatibility: ${_this.compatibility}, sharedInterests: ${_this.sharedInterests}, reasonSummary: ${_this.reasonSummary}, snapshotId: ${_this.snapshotId})';
+  return 'Candidate(candidateUserId: ${_this.candidateUserId}, displayName: ${_this.displayName}, age: ${_this.age}, isDemo: ${_this.isDemo}, traitLabels: ${_this.traitLabels}, rank: ${_this.rank}, fitForward: ${_this.fitForward}, fitBackward: ${_this.fitBackward}, compatibility: ${_this.compatibility}, sharedInterests: ${_this.sharedInterests}, reasonSummary: ${_this.reasonSummary}, snapshotId: ${_this.snapshotId}, finalScore: ${_this.finalScore}, datesCompleted: ${_this.datesCompleted}, datesIncomplete: ${_this.datesIncomplete})';
 }
 
 
@@ -54,7 +54,7 @@ abstract mixin class $CandidateCopyWith<$Res>  {
   factory $CandidateCopyWith(Candidate value, $Res Function(Candidate) _then) = _$CandidateCopyWithImpl;
 @useResult
 $Res call({
-@JsonKey(name: 'candidate_user_id') String candidateUserId,@JsonKey(name: 'display_name') String displayName, int age,@JsonKey(name: 'is_demo') bool isDemo,@JsonKey(name: 'trait_labels') Map<String, List<String>> traitLabels, int rank,@JsonKey(name: 'fit_forward') double fitForward,@JsonKey(name: 'fit_backward') double fitBackward, double compatibility,@JsonKey(name: 'shared_interests') List<String> sharedInterests,@JsonKey(name: 'reason_summary') String reasonSummary,@JsonKey(name: 'snapshot_id') String snapshotId
+@JsonKey(name: 'candidate_user_id') String candidateUserId,@JsonKey(name: 'display_name') String displayName, int age,@JsonKey(name: 'is_demo') bool isDemo,@JsonKey(name: 'trait_labels') Map<String, List<String>> traitLabels, int rank,@JsonKey(name: 'fit_forward') double fitForward,@JsonKey(name: 'fit_backward') double fitBackward, double compatibility,@JsonKey(name: 'shared_interests') List<String> sharedInterests,@JsonKey(name: 'reason_summary') String reasonSummary,@JsonKey(name: 'snapshot_id') String snapshotId,@JsonKey(name: 'final_score') double? finalScore,@JsonKey(name: 'dates_completed') int? datesCompleted,@JsonKey(name: 'dates_incomplete') int? datesIncomplete
 });
 
 
@@ -71,7 +71,7 @@ class _$CandidateCopyWithImpl<$Res>
 
 /// Create a copy of Candidate
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? candidateUserId = null,Object? displayName = null,Object? age = null,Object? isDemo = null,Object? traitLabels = null,Object? rank = null,Object? fitForward = null,Object? fitBackward = null,Object? compatibility = null,Object? sharedInterests = null,Object? reasonSummary = null,Object? snapshotId = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? candidateUserId = null,Object? displayName = null,Object? age = null,Object? isDemo = null,Object? traitLabels = null,Object? rank = null,Object? fitForward = null,Object? fitBackward = null,Object? compatibility = null,Object? sharedInterests = null,Object? reasonSummary = null,Object? snapshotId = null,Object? finalScore = freezed,Object? datesCompleted = freezed,Object? datesIncomplete = freezed,}) {
   return _then(Candidate(
 candidateUserId: null == candidateUserId ? _self.candidateUserId : candidateUserId // ignore: cast_nullable_to_non_nullable
 as String,displayName: null == displayName ? _self.displayName : displayName // ignore: cast_nullable_to_non_nullable
@@ -85,7 +85,10 @@ as double,compatibility: null == compatibility ? _self.compatibility : compatibi
 as double,sharedInterests: null == sharedInterests ? _self.sharedInterests : sharedInterests // ignore: cast_nullable_to_non_nullable
 as List<String>,reasonSummary: null == reasonSummary ? _self.reasonSummary : reasonSummary // ignore: cast_nullable_to_non_nullable
 as String,snapshotId: null == snapshotId ? _self.snapshotId : snapshotId // ignore: cast_nullable_to_non_nullable
-as String,
+as String,finalScore: freezed == finalScore ? _self.finalScore : finalScore // ignore: cast_nullable_to_non_nullable
+as double?,datesCompleted: freezed == datesCompleted ? _self.datesCompleted : datesCompleted // ignore: cast_nullable_to_non_nullable
+as int?,datesIncomplete: freezed == datesIncomplete ? _self.datesIncomplete : datesIncomplete // ignore: cast_nullable_to_non_nullable
+as int?,
   ));
 }
 
@@ -170,10 +173,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(name: 'candidate_user_id')  String candidateUserId, @JsonKey(name: 'display_name')  String displayName,  int age, @JsonKey(name: 'is_demo')  bool isDemo, @JsonKey(name: 'trait_labels')  Map<String, List<String>> traitLabels,  int rank, @JsonKey(name: 'fit_forward')  double fitForward, @JsonKey(name: 'fit_backward')  double fitBackward,  double compatibility, @JsonKey(name: 'shared_interests')  List<String> sharedInterests, @JsonKey(name: 'reason_summary')  String reasonSummary, @JsonKey(name: 'snapshot_id')  String snapshotId)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(name: 'candidate_user_id')  String candidateUserId, @JsonKey(name: 'display_name')  String displayName,  int age, @JsonKey(name: 'is_demo')  bool isDemo, @JsonKey(name: 'trait_labels')  Map<String, List<String>> traitLabels,  int rank, @JsonKey(name: 'fit_forward')  double fitForward, @JsonKey(name: 'fit_backward')  double fitBackward,  double compatibility, @JsonKey(name: 'shared_interests')  List<String> sharedInterests, @JsonKey(name: 'reason_summary')  String reasonSummary, @JsonKey(name: 'snapshot_id')  String snapshotId, @JsonKey(name: 'final_score')  double? finalScore, @JsonKey(name: 'dates_completed')  int? datesCompleted, @JsonKey(name: 'dates_incomplete')  int? datesIncomplete)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Candidate() when $default != null:
-return $default(_that.candidateUserId,_that.displayName,_that.age,_that.isDemo,_that.traitLabels,_that.rank,_that.fitForward,_that.fitBackward,_that.compatibility,_that.sharedInterests,_that.reasonSummary,_that.snapshotId);case _:
+return $default(_that.candidateUserId,_that.displayName,_that.age,_that.isDemo,_that.traitLabels,_that.rank,_that.fitForward,_that.fitBackward,_that.compatibility,_that.sharedInterests,_that.reasonSummary,_that.snapshotId,_that.finalScore,_that.datesCompleted,_that.datesIncomplete);case _:
   return orElse();
 
 }
@@ -191,10 +194,10 @@ return $default(_that.candidateUserId,_that.displayName,_that.age,_that.isDemo,_
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(name: 'candidate_user_id')  String candidateUserId, @JsonKey(name: 'display_name')  String displayName,  int age, @JsonKey(name: 'is_demo')  bool isDemo, @JsonKey(name: 'trait_labels')  Map<String, List<String>> traitLabels,  int rank, @JsonKey(name: 'fit_forward')  double fitForward, @JsonKey(name: 'fit_backward')  double fitBackward,  double compatibility, @JsonKey(name: 'shared_interests')  List<String> sharedInterests, @JsonKey(name: 'reason_summary')  String reasonSummary, @JsonKey(name: 'snapshot_id')  String snapshotId)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(name: 'candidate_user_id')  String candidateUserId, @JsonKey(name: 'display_name')  String displayName,  int age, @JsonKey(name: 'is_demo')  bool isDemo, @JsonKey(name: 'trait_labels')  Map<String, List<String>> traitLabels,  int rank, @JsonKey(name: 'fit_forward')  double fitForward, @JsonKey(name: 'fit_backward')  double fitBackward,  double compatibility, @JsonKey(name: 'shared_interests')  List<String> sharedInterests, @JsonKey(name: 'reason_summary')  String reasonSummary, @JsonKey(name: 'snapshot_id')  String snapshotId, @JsonKey(name: 'final_score')  double? finalScore, @JsonKey(name: 'dates_completed')  int? datesCompleted, @JsonKey(name: 'dates_incomplete')  int? datesIncomplete)  $default,) {final _that = this;
 switch (_that) {
 case _Candidate():
-return $default(_that.candidateUserId,_that.displayName,_that.age,_that.isDemo,_that.traitLabels,_that.rank,_that.fitForward,_that.fitBackward,_that.compatibility,_that.sharedInterests,_that.reasonSummary,_that.snapshotId);case _:
+return $default(_that.candidateUserId,_that.displayName,_that.age,_that.isDemo,_that.traitLabels,_that.rank,_that.fitForward,_that.fitBackward,_that.compatibility,_that.sharedInterests,_that.reasonSummary,_that.snapshotId,_that.finalScore,_that.datesCompleted,_that.datesIncomplete);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -211,10 +214,10 @@ return $default(_that.candidateUserId,_that.displayName,_that.age,_that.isDemo,_
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(name: 'candidate_user_id')  String candidateUserId, @JsonKey(name: 'display_name')  String displayName,  int age, @JsonKey(name: 'is_demo')  bool isDemo, @JsonKey(name: 'trait_labels')  Map<String, List<String>> traitLabels,  int rank, @JsonKey(name: 'fit_forward')  double fitForward, @JsonKey(name: 'fit_backward')  double fitBackward,  double compatibility, @JsonKey(name: 'shared_interests')  List<String> sharedInterests, @JsonKey(name: 'reason_summary')  String reasonSummary, @JsonKey(name: 'snapshot_id')  String snapshotId)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(name: 'candidate_user_id')  String candidateUserId, @JsonKey(name: 'display_name')  String displayName,  int age, @JsonKey(name: 'is_demo')  bool isDemo, @JsonKey(name: 'trait_labels')  Map<String, List<String>> traitLabels,  int rank, @JsonKey(name: 'fit_forward')  double fitForward, @JsonKey(name: 'fit_backward')  double fitBackward,  double compatibility, @JsonKey(name: 'shared_interests')  List<String> sharedInterests, @JsonKey(name: 'reason_summary')  String reasonSummary, @JsonKey(name: 'snapshot_id')  String snapshotId, @JsonKey(name: 'final_score')  double? finalScore, @JsonKey(name: 'dates_completed')  int? datesCompleted, @JsonKey(name: 'dates_incomplete')  int? datesIncomplete)?  $default,) {final _that = this;
 switch (_that) {
 case _Candidate() when $default != null:
-return $default(_that.candidateUserId,_that.displayName,_that.age,_that.isDemo,_that.traitLabels,_that.rank,_that.fitForward,_that.fitBackward,_that.compatibility,_that.sharedInterests,_that.reasonSummary,_that.snapshotId);case _:
+return $default(_that.candidateUserId,_that.displayName,_that.age,_that.isDemo,_that.traitLabels,_that.rank,_that.fitForward,_that.fitBackward,_that.compatibility,_that.sharedInterests,_that.reasonSummary,_that.snapshotId,_that.finalScore,_that.datesCompleted,_that.datesIncomplete);case _:
   return null;
 
 }
@@ -226,7 +229,7 @@ return $default(_that.candidateUserId,_that.displayName,_that.age,_that.isDemo,_
 @JsonSerializable()
 
 class _Candidate implements Candidate {
-  const _Candidate({@JsonKey(name: 'candidate_user_id') required this.candidateUserId, @JsonKey(name: 'display_name') required this.displayName, required this.age, @JsonKey(name: 'is_demo') required this.isDemo, @JsonKey(name: 'trait_labels') required  Map<String, List<String>> traitLabels, required this.rank, @JsonKey(name: 'fit_forward') required this.fitForward, @JsonKey(name: 'fit_backward') required this.fitBackward, required this.compatibility, @JsonKey(name: 'shared_interests') required  List<String> sharedInterests, @JsonKey(name: 'reason_summary') required this.reasonSummary, @JsonKey(name: 'snapshot_id') required this.snapshotId}): _traitLabels = traitLabels,_sharedInterests = sharedInterests;
+  const _Candidate({@JsonKey(name: 'candidate_user_id') required this.candidateUserId, @JsonKey(name: 'display_name') required this.displayName, required this.age, @JsonKey(name: 'is_demo') required this.isDemo, @JsonKey(name: 'trait_labels') required  Map<String, List<String>> traitLabels, required this.rank, @JsonKey(name: 'fit_forward') required this.fitForward, @JsonKey(name: 'fit_backward') required this.fitBackward, required this.compatibility, @JsonKey(name: 'shared_interests') required  List<String> sharedInterests, @JsonKey(name: 'reason_summary') required this.reasonSummary, @JsonKey(name: 'snapshot_id') required this.snapshotId, @JsonKey(name: 'final_score') this.finalScore, @JsonKey(name: 'dates_completed') this.datesCompleted, @JsonKey(name: 'dates_incomplete') this.datesIncomplete}): _traitLabels = traitLabels,_sharedInterests = sharedInterests;
   factory _Candidate.fromJson(Map<String, dynamic> json) => _$CandidateFromJson(json);
 
 @override@JsonKey(name: 'candidate_user_id') final  String candidateUserId;
@@ -253,6 +256,9 @@ class _Candidate implements Candidate {
 
 @override@JsonKey(name: 'reason_summary') final  String reasonSummary;
 @override@JsonKey(name: 'snapshot_id') final  String snapshotId;
+@override@JsonKey(name: 'final_score') final  double? finalScore;
+@override@JsonKey(name: 'dates_completed') final  int? datesCompleted;
+@override@JsonKey(name: 'dates_incomplete') final  int? datesIncomplete;
 
 /// Create a copy of Candidate
 /// with the given fields replaced by the non-null parameter values.
@@ -267,18 +273,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _Candidate&&(identical(other.candidateUserId, candidateUserId) || other.candidateUserId == candidateUserId)&&(identical(other.displayName, displayName) || other.displayName == displayName)&&(identical(other.age, age) || other.age == age)&&(identical(other.isDemo, isDemo) || other.isDemo == isDemo)&&const DeepCollectionEquality().equals(other.traitLabels, _traitLabels)&&(identical(other.rank, rank) || other.rank == rank)&&(identical(other.fitForward, fitForward) || other.fitForward == fitForward)&&(identical(other.fitBackward, fitBackward) || other.fitBackward == fitBackward)&&(identical(other.compatibility, compatibility) || other.compatibility == compatibility)&&const DeepCollectionEquality().equals(other.sharedInterests, _sharedInterests)&&(identical(other.reasonSummary, reasonSummary) || other.reasonSummary == reasonSummary)&&(identical(other.snapshotId, snapshotId) || other.snapshotId == snapshotId));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _Candidate&&(identical(other.candidateUserId, candidateUserId) || other.candidateUserId == candidateUserId)&&(identical(other.displayName, displayName) || other.displayName == displayName)&&(identical(other.age, age) || other.age == age)&&(identical(other.isDemo, isDemo) || other.isDemo == isDemo)&&const DeepCollectionEquality().equals(other.traitLabels, _traitLabels)&&(identical(other.rank, rank) || other.rank == rank)&&(identical(other.fitForward, fitForward) || other.fitForward == fitForward)&&(identical(other.fitBackward, fitBackward) || other.fitBackward == fitBackward)&&(identical(other.compatibility, compatibility) || other.compatibility == compatibility)&&const DeepCollectionEquality().equals(other.sharedInterests, _sharedInterests)&&(identical(other.reasonSummary, reasonSummary) || other.reasonSummary == reasonSummary)&&(identical(other.snapshotId, snapshotId) || other.snapshotId == snapshotId)&&(identical(other.finalScore, finalScore) || other.finalScore == finalScore)&&(identical(other.datesCompleted, datesCompleted) || other.datesCompleted == datesCompleted)&&(identical(other.datesIncomplete, datesIncomplete) || other.datesIncomplete == datesIncomplete));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
-    return Object.hash(runtimeType,candidateUserId,displayName,age,isDemo,const DeepCollectionEquality().hash(_traitLabels),rank,fitForward,fitBackward,compatibility,const DeepCollectionEquality().hash(_sharedInterests),reasonSummary,snapshotId);
+    return Object.hash(runtimeType,candidateUserId,displayName,age,isDemo,const DeepCollectionEquality().hash(_traitLabels),rank,fitForward,fitBackward,compatibility,const DeepCollectionEquality().hash(_sharedInterests),reasonSummary,snapshotId,finalScore,datesCompleted,datesIncomplete);
 }
 
 @override
 String toString() {
-    return 'Candidate(candidateUserId: $candidateUserId, displayName: $displayName, age: $age, isDemo: $isDemo, traitLabels: $traitLabels, rank: $rank, fitForward: $fitForward, fitBackward: $fitBackward, compatibility: $compatibility, sharedInterests: $sharedInterests, reasonSummary: $reasonSummary, snapshotId: $snapshotId)';
+    return 'Candidate(candidateUserId: $candidateUserId, displayName: $displayName, age: $age, isDemo: $isDemo, traitLabels: $traitLabels, rank: $rank, fitForward: $fitForward, fitBackward: $fitBackward, compatibility: $compatibility, sharedInterests: $sharedInterests, reasonSummary: $reasonSummary, snapshotId: $snapshotId, finalScore: $finalScore, datesCompleted: $datesCompleted, datesIncomplete: $datesIncomplete)';
 }
 
 
@@ -289,7 +295,7 @@ abstract mixin class _$CandidateCopyWith<$Res> implements $CandidateCopyWith<$Re
   factory _$CandidateCopyWith(_Candidate value, $Res Function(_Candidate) _then) = __$CandidateCopyWithImpl;
 @override @useResult
 $Res call({
-@JsonKey(name: 'candidate_user_id') String candidateUserId,@JsonKey(name: 'display_name') String displayName, int age,@JsonKey(name: 'is_demo') bool isDemo,@JsonKey(name: 'trait_labels') Map<String, List<String>> traitLabels, int rank,@JsonKey(name: 'fit_forward') double fitForward,@JsonKey(name: 'fit_backward') double fitBackward, double compatibility,@JsonKey(name: 'shared_interests') List<String> sharedInterests,@JsonKey(name: 'reason_summary') String reasonSummary,@JsonKey(name: 'snapshot_id') String snapshotId
+@JsonKey(name: 'candidate_user_id') String candidateUserId,@JsonKey(name: 'display_name') String displayName, int age,@JsonKey(name: 'is_demo') bool isDemo,@JsonKey(name: 'trait_labels') Map<String, List<String>> traitLabels, int rank,@JsonKey(name: 'fit_forward') double fitForward,@JsonKey(name: 'fit_backward') double fitBackward, double compatibility,@JsonKey(name: 'shared_interests') List<String> sharedInterests,@JsonKey(name: 'reason_summary') String reasonSummary,@JsonKey(name: 'snapshot_id') String snapshotId,@JsonKey(name: 'final_score') double? finalScore,@JsonKey(name: 'dates_completed') int? datesCompleted,@JsonKey(name: 'dates_incomplete') int? datesIncomplete
 });
 
 
@@ -306,7 +312,7 @@ class __$CandidateCopyWithImpl<$Res>
 
 /// Create a copy of Candidate
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? candidateUserId = null,Object? displayName = null,Object? age = null,Object? isDemo = null,Object? traitLabels = null,Object? rank = null,Object? fitForward = null,Object? fitBackward = null,Object? compatibility = null,Object? sharedInterests = null,Object? reasonSummary = null,Object? snapshotId = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? candidateUserId = null,Object? displayName = null,Object? age = null,Object? isDemo = null,Object? traitLabels = null,Object? rank = null,Object? fitForward = null,Object? fitBackward = null,Object? compatibility = null,Object? sharedInterests = null,Object? reasonSummary = null,Object? snapshotId = null,Object? finalScore = freezed,Object? datesCompleted = freezed,Object? datesIncomplete = freezed,}) {
   return _then(_Candidate(
 candidateUserId: null == candidateUserId ? _self.candidateUserId : candidateUserId // ignore: cast_nullable_to_non_nullable
 as String,displayName: null == displayName ? _self.displayName : displayName // ignore: cast_nullable_to_non_nullable
@@ -320,7 +326,10 @@ as double,compatibility: null == compatibility ? _self.compatibility : compatibi
 as double,sharedInterests: null == sharedInterests ? _self._sharedInterests : sharedInterests // ignore: cast_nullable_to_non_nullable
 as List<String>,reasonSummary: null == reasonSummary ? _self.reasonSummary : reasonSummary // ignore: cast_nullable_to_non_nullable
 as String,snapshotId: null == snapshotId ? _self.snapshotId : snapshotId // ignore: cast_nullable_to_non_nullable
-as String,
+as String,finalScore: freezed == finalScore ? _self.finalScore : finalScore // ignore: cast_nullable_to_non_nullable
+as double?,datesCompleted: freezed == datesCompleted ? _self.datesCompleted : datesCompleted // ignore: cast_nullable_to_non_nullable
+as int?,datesIncomplete: freezed == datesIncomplete ? _self.datesIncomplete : datesIncomplete // ignore: cast_nullable_to_non_nullable
+as int?,
   ));
 }
 

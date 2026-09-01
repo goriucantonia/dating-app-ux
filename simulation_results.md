@@ -24,6 +24,15 @@ Status: planning locked 2026-09-01. Server counterparts: `date_simulation.md` (t
 - Results provider fetches `GET /analyses/{id}/dates` once on `complete` (no polling — terminal state); transcripts fetch lazily per date and cache in memory for the session.
 - During `simulating`, the transcript viewer is reachable for completed dates (per `simulate_date_page.md`) with a "dates still running" banner instead of the analytics header — same widgets, partial data, honestly framed.
 
+## 2a. Built 2026-09-01 (Step 13) — decisions made while building, inline
+
+- **The transcript viewer builds every row** (a plain scroll view, not a lazy list). `?seq=` needs message N to exist before it can scroll to it, and a transcript is at most 19 rows (`TURN_CAP + MAX_EVENTS_PER_DATE`) — laziness buys nothing here and costs the anchor.
+- **`ended_by` and `excluded_from_score` are read from the wire, never re-derived.** The server added `ended_by` to both the date list and the transcript for exactly this screen; a client with its own idea of "mutual" or of the 10-turn rule is a client that can disagree with the score it is showing.
+- **The rubric weights are copied into the client (`rubricWeights`), keyed by `rubric_version`.** The composition view recomputes `date_score` from the wire's `criteria` in front of the user and says "mismatch" if it disagrees with the stored value. A v2 rubric is a second table entry, never an edit in place.
+- **The satisfaction chart's axis is fixed at 0–100 even though real data mostly sits at 0** (Step 11's model finding). Rescaling would turn a flat evening into a dramatic one; the caption under the chart says what the numbers are. Rows without state are gaps in the line, not zeros.
+- **The metadata toggle lives in `shared_preferences`, keyed per user id.** The token store is wiped on sign-out, and a preference is not a session.
+- **Results fetch once on `complete` and the checklist is live during `simulating` without a second loop:** the date-list provider re-reads exactly when the ONE poller reports that the server's `progress.updated_at` moved. On a terminal status the poller stops, the key stops changing, and the results stay cached for the session.
+
 ## 3. Decisions (trades named)
 
 1. **Score composition is always one tap away.** Cost: exposes that the weights are opinions. Accepted deliberately — a bare "78" invites either blind trust or blind distrust; the breakdown invites reading the dates, which is the actual product.

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../core/notify/completion.dart';
 import 'router.dart';
 import 'theme.dart';
 
@@ -16,6 +17,11 @@ class App extends ConsumerWidget {
       // System-following: the OS decides light vs dark (ux_architecture.md §1.6).
       themeMode: ThemeMode.system,
       routerConfig: ref.watch(routerProvider),
+      // S13-U4: the app-wide messenger and the listener that uses it, so
+      // "your dates have finished" reaches the user wherever they are.
+      scaffoldMessengerKey: scaffoldMessengerKey,
+      builder: (context, child) =>
+          CompletionListener(child: child ?? const SizedBox.shrink()),
     );
   }
 }

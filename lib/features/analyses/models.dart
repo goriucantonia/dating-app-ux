@@ -25,6 +25,13 @@ abstract class Candidate with _$Candidate {
     @JsonKey(name: 'shared_interests') required List<String> sharedInterests,
     @JsonKey(name: 'reason_summary') required String reasonSummary,
     @JsonKey(name: 'snapshot_id') required String snapshotId,
+    // S12/S13: the score once the dates have been judged. Null until then —
+    // and null is DIFFERENT from zero. Every date with this person may have
+    // failed too early to judge, and 0.0 would say "they were terrible
+    // together" about an evening that never happened.
+    @JsonKey(name: 'final_score') double? finalScore,
+    @JsonKey(name: 'dates_completed') int? datesCompleted,
+    @JsonKey(name: 'dates_incomplete') int? datesIncomplete,
   }) = _Candidate;
 
   factory Candidate.fromJson(Map<String, dynamic> json) =>

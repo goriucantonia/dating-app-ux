@@ -4,8 +4,11 @@ import 'package:go_router/go_router.dart';
 
 import '../../app/layout_shell.dart';
 import '../../core/api/api_client.dart';
+import '../../core/notify/local_notification.dart';
 import '../../core/polling/poller.dart';
 import '../common/demo_chip.dart';
+import '../dates/date_checklist.dart';
+import '../dates/dates_repository.dart';
 import '../traits/models.dart' show traitCategoryLabels, traitCategoryOrder;
 import 'analyses_repository.dart';
 import 'models.dart';
@@ -20,6 +23,11 @@ import 'models.dart';
 ///
 /// Deep links land correctly in any phase (S10-U13) precisely because of that:
 /// the route reads the status it is given.
+///
+/// Step 13 fills in phase 3 (`simulating` — S13-U1..U4), the `failed` state
+/// (S13-U5), and the hand-off from `complete` to the results screen, which
+/// IS a separate route: the results are a different page, not a different
+/// phase of this object.
 class AnalysisScreen extends ConsumerWidget {
   const AnalysisScreen({super.key, required this.analysisId});
 
@@ -55,19 +63,8 @@ class AnalysisScreen extends ConsumerWidget {
                 subtitle: 'Comparing you with everyone who is open to matching.',
                 spinner: true,
               ),
-            // S11-B10: the subtitle is the SERVER's sentence, naming the real
-            // stage — "Simulating date 2 of 6 — at the car meet…". Never a
-            // fake timer and never a stage name invented on this side, so
-            // what the user reads is what the pipeline is actually doing.
-            'simulating' => _Phase(
-                icon: Icons.movie_filter,
-                title: 'Running the dates…',
-                subtitle: analysis.progress?['message'] as String? ??
-                    'Getting the first date started.',
-                footnote: 'This takes a while. You can close the app — '
-                    'it keeps going without you.',
-                spinner: true,
-              ),
+            // Phase 3 (S13-U1..U4).
+            'simulating' => _SimulatingPhase(analysis: analysis),
             // S10-U6 / U10: honest, calm, and with NO simulate button.
             'no_candidates' => _Phase(
                 icon: Icons.person_search,
@@ -78,17 +75,254 @@ class AnalysisScreen extends ConsumerWidget {
                     'Nothing has gone wrong. As more people join and open '
                     'themselves to matching, this will fill up.',
               ),
-            'failed' => _ErrorRetry(
-                message: analysis.error != null
-                    ? "That analysis didn't finish."
-                    : 'That analysis failed.',
-                onRetry: () => ref
-                    .read(analysisPollerProvider(analysisId).notifier)
-                    .refreshNow(),
-              ),
-            // Phase 2 (S10-U8): the reveal.
+            // S13-U5: name the stage that died; retry RESUMES.
+            'failed' => _FailedPhase(analysis: analysis),
+            // Phase 2 (S10-U8): the reveal — and, once complete, the door to
+            // the results.
             _ => _Reveal(analysis: analysis),
           },
+        ),
+      ),
+    );
+  }
+}
+
+/// Phase 3: the wait, made watchable (S13-U1..U4).
+///
+/// Real stage names from the server's `progress`, never a fake percentage
+/// bar; the checklist of dates under it; finished dates open immediately
+/// (S13-U3 — the rows are already checkpointed, so this is free); and the
+/// one thing this screen most needs to say: you can leave.
+class _SimulatingPhase extends ConsumerWidget {
+  const _SimulatingPhase({required this.analysis});
+
+  final Analysis analysis;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final dates = ref.watch(datesProvider(analysis.id));
+    final message = analysis.progress?['message'] as String? ??
+        'Getting the first date started.';
+    final stage = analysis.progress?['stage'] as String?;
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      children: [
+        const SizedBox(height: 8),
+        Row(
+          children: [
+            const SizedBox(
+              width: 28,
+              height: 28,
+              child: CircularProgressIndicator(strokeWidth: 3),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    stage == 'judging' ? 'Scoring the dates…' : 'Running the dates…',
+                    style: theme.textTheme.headlineSmall,
+                  ),
+                  const SizedBox(height: 4),
+                  // S11-B10 / S13-U1: the SERVER's sentence for the real stage.
+                  Text(message, style: theme.textTheme.bodyLarge),
+                ],
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 16),
+        // S13-U4: the prominent affordance.
+        Card(
+          color: theme.colorScheme.primaryContainer,
+          child: Padding(
+            padding: const EdgeInsets.all(14),
+            child: Row(
+              children: [
+                Icon(Icons.exit_to_app,
+                    color: theme.colorScheme.onPrimaryContainer),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('You can leave — this keeps running.',
+                          style: theme.textTheme.titleSmall?.copyWith(
+                              color: theme.colorScheme.onPrimaryContainer)),
+                      Text(
+                        'Close the app, come back later. We’ll show a note '
+                        'when the dates have finished.',
+                        style: theme.textTheme.bodySmall?.copyWith(
+                            color: theme.colorScheme.onPrimaryContainer),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: 20),
+        Text('The dates', style: theme.textTheme.titleMedium),
+        const SizedBox(height: 4),
+        Text(
+          'Finished ones open right away — you don’t have to wait for the rest.',
+          style: theme.textTheme.bodySmall,
+        ),
+        const SizedBox(height: 8),
+        dates.when(
+          loading: () => const Padding(
+            padding: EdgeInsets.all(16),
+            child: Center(child: CircularProgressIndicator()),
+          ),
+          // A failed date-list read is not the analysis failing: the poller
+          // still has the truth. Say so, quietly, and let the next progress
+          // change refetch.
+          error: (e, _) => Text(
+            e is ApiException
+                ? e.message
+                : "Couldn't load the date list just now — it refreshes on its own.",
+            style: theme.textTheme.bodySmall,
+          ),
+          data: (payload) => DateChecklist(dates: payload.dates),
+        ),
+        const SizedBox(height: 24),
+        Center(
+          child: TextButton(
+            onPressed: () => context.go('/analyses/${analysis.id}/results'),
+            child: const Text('See what there is so far'),
+          ),
+        ),
+        const SizedBox(height: 32),
+      ],
+    );
+  }
+}
+
+/// S13-U5: a `failed` analysis names the stage that died, and the retry
+/// **resumes** — the server keeps every checkpointed row, `ensure_dates`
+/// reuses them, and a finished date is a no-op on re-run. So the copy says
+/// what is true: "picks up where it stopped".
+///
+/// A failure in MATCHING (no candidates yet) has nothing to resume, and the
+/// server refuses `/simulate` for it; the honest action there is a new
+/// analysis, and that is the button shown.
+class _FailedPhase extends ConsumerStatefulWidget {
+  const _FailedPhase({required this.analysis});
+
+  final Analysis analysis;
+
+  @override
+  ConsumerState<_FailedPhase> createState() => _FailedPhaseState();
+}
+
+class _FailedPhaseState extends ConsumerState<_FailedPhase> {
+  bool _busy = false;
+  bool _showDetails = false;
+
+  Future<void> _resume() async {
+    setState(() => _busy = true);
+    try {
+      await ref.read(analysesRepositoryProvider).simulate(widget.analysis.id);
+      // The server flips the row in a background task; keep polling through
+      // the `failed` it may still report for a moment.
+      await ref
+          .read(analysisPollerProvider(widget.analysis.id).notifier)
+          .kick();
+      // Still here (the row has not flipped yet)? Hand the button back
+      // rather than spinning forever over a request that was accepted.
+      if (mounted) setState(() => _busy = false);
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _busy = false);
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(e is ApiException
+            ? e.message
+            : "Couldn't pick it up just now. Try again in a moment."),
+      ));
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final a = widget.analysis;
+    final stage = a.progress?['stage'] as String?;
+    final resumable = a.candidates.isNotEmpty;
+    final stageName = switch (stage) {
+      null when !resumable => 'while working out who fits',
+      null => 'before the dates started',
+      'queued' => 'while waiting for a free slot',
+      'simulating' => 'during the dates',
+      'judging' => 'while scoring the dates',
+      _ => 'at the "$stage" stage',
+    };
+    final lastMessage = a.progress?['message'] as String?;
+    return Center(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.report_problem_outlined,
+                size: 56, color: theme.colorScheme.error),
+            const SizedBox(height: 16),
+            Text('This analysis stopped $stageName',
+                style: theme.textTheme.headlineSmall,
+                textAlign: TextAlign.center),
+            if (lastMessage != null) ...[
+              const SizedBox(height: 8),
+              Text('Last thing it was doing: $lastMessage',
+                  style: theme.textTheme.bodyMedium,
+                  textAlign: TextAlign.center),
+            ],
+            const SizedBox(height: 16),
+            if (resumable) ...[
+              FilledButton.icon(
+                onPressed: _busy ? null : _resume,
+                icon: _busy
+                    ? const SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: CircularProgressIndicator(strokeWidth: 2))
+                    : const Icon(Icons.play_arrow),
+                label: Text(_busy ? 'Picking up…' : 'Pick up where it stopped'),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Nothing is redone. Every message already spoken is kept, and '
+                'the dates continue from the last one.',
+                style: theme.textTheme.bodySmall,
+                textAlign: TextAlign.center,
+              ),
+            ] else ...[
+              FilledButton.icon(
+                onPressed: () => context.go('/'),
+                icon: const Icon(Icons.refresh),
+                label: const Text('Start a new analysis'),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Nobody had been matched yet, so there is nothing to pick up.',
+                style: theme.textTheme.bodySmall,
+                textAlign: TextAlign.center,
+              ),
+            ],
+            if (a.error != null && a.error!.isNotEmpty) ...[
+              const SizedBox(height: 12),
+              TextButton(
+                onPressed: () => setState(() => _showDetails = !_showDetails),
+                child: Text(_showDetails ? 'Hide details' : 'Technical details'),
+              ),
+              if (_showDetails)
+                Text(a.error!,
+                    style: theme.textTheme.bodySmall
+                        ?.copyWith(fontFamily: 'monospace'),
+                    textAlign: TextAlign.center),
+            ],
+          ],
         ),
       ),
     );
@@ -104,9 +338,31 @@ class _Reveal extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final partial = analysis.poolStatus == 'partial';
+    final complete = analysis.status == 'complete';
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
+        if (complete) ...[
+          // The door to the results (S13-U10). Above the cards, because a
+          // returning user is here for the outcome, not the reveal.
+          Card(
+            color: theme.colorScheme.primaryContainer,
+            child: ListTile(
+              leading: Icon(Icons.auto_awesome,
+                  color: theme.colorScheme.onPrimaryContainer),
+              title: Text('The dates have run',
+                  style: TextStyle(color: theme.colorScheme.onPrimaryContainer)),
+              subtitle: Text(
+                analysis.progress?['message'] as String? ??
+                    'See how each one went.',
+                style: TextStyle(color: theme.colorScheme.onPrimaryContainer),
+              ),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => context.go('/analyses/${analysis.id}/results'),
+            ),
+          ),
+          const SizedBox(height: 12),
+        ],
         Text(
           analysis.candidates.length == 1
               ? 'One person fits'
@@ -147,13 +403,12 @@ class _Reveal extends StatelessWidget {
         // the capability).
         if (analysis.status == 'matched')
           _SimulateButton(analysisId: analysis.id)
-        else
+        else if (complete)
           Center(
-            child: Text(
-              'These dates have already run. Reading them back arrives in the '
-              'next build step.',
-              textAlign: TextAlign.center,
-              style: theme.textTheme.bodySmall,
+            child: FilledButton.icon(
+              onPressed: () => context.go('/analyses/${analysis.id}/results'),
+              icon: const Icon(Icons.insights),
+              label: const Text('See the results'),
             ),
           ),
         const SizedBox(height: 32),
@@ -223,9 +478,23 @@ class _CandidateCardState extends State<_CandidateCard> {
                     ],
                   ),
                 ),
-                Text('$percent%',
-                    style: theme.textTheme.headlineSmall
-                        ?.copyWith(color: theme.colorScheme.primary)),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text('$percent%',
+                        style: theme.textTheme.headlineSmall
+                            ?.copyWith(color: theme.colorScheme.primary)),
+                    Text('fit', style: theme.textTheme.labelSmall),
+                    // Once judged, the date score sits beside the fit — the
+                    // two are different things and both are shown.
+                    if (c.finalScore != null) ...[
+                      const SizedBox(height: 4),
+                      Text(c.finalScore!.toStringAsFixed(1),
+                          style: theme.textTheme.titleMedium),
+                      Text('date score', style: theme.textTheme.labelSmall),
+                    ],
+                  ],
+                ),
               ],
             ),
             const SizedBox(height: 10),
@@ -441,7 +710,7 @@ class _ErrorRetry extends StatelessWidget {
   }
 }
 
-/// The one control that turns a list of names into six simulated evenings
+/// The one control that turns a list of names into simulated evenings
 /// (S11-B11).
 ///
 /// Stateful for one reason: between the tap and the server's 202 there are a
@@ -463,11 +732,14 @@ class _SimulateButtonState extends ConsumerState<_SimulateButton> {
 
   Future<void> _start() async {
     setState(() => _starting = true);
+    // S13-U4: the browser only grants notification permission from a user
+    // gesture, and this tap is the one that means "I might walk away".
+    await requestNotificationPermission();
     try {
       await ref.read(analysesRepositoryProvider).simulate(widget.analysisId);
       await ref
           .read(analysisPollerProvider(widget.analysisId).notifier)
-          .refreshNow();
+          .kick();
     } catch (e) {
       // D-005: a submit that fails must SAY so. Catching only ApiException
       // here would leave a storage- or transport-level failure showing the
