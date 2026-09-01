@@ -360,9 +360,11 @@ class _HistoryRow extends StatelessWidget {
             ),
           ],
         ),
-        subtitle: top == null
-            ? null
-            : Padding(
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (top != null)
+              Padding(
                 padding: const EdgeInsets.only(top: 6),
                 child: Row(
                   children: [
@@ -374,6 +376,18 @@ class _HistoryRow extends StatelessWidget {
                   ],
                 ),
               ),
+            // S15-U2: the tombstone, on the list, not a 404 later.
+            if (analysis.removedCandidates > 0)
+              Padding(
+                padding: const EdgeInsets.only(top: 4),
+                child: Text(
+                  removedCandidatesSentence(analysis.removedCandidates),
+                  style: theme.textTheme.bodySmall
+                      ?.copyWith(color: theme.colorScheme.outline),
+                ),
+              ),
+          ],
+        ),
         trailing: const Icon(Icons.chevron_right),
       ),
     );
@@ -418,3 +432,8 @@ class _ErrorRetry extends StatelessWidget {
     );
   }
 }
+
+/// S15-U2, in one place: "this person removed their account", pluralised.
+String removedCandidatesSentence(int n) => n == 1
+    ? 'One person in this analysis removed their account.'
+    : '$n people in this analysis removed their accounts.';

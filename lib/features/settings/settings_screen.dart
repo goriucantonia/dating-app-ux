@@ -10,9 +10,9 @@ import '../auth/auth_repository.dart';
 /// `/settings` (S8-U8) — the opt-in toggle with its one-line description,
 /// editable preferences, and sign out.
 ///
-/// **Delete account is deliberately absent.** It ships in Step 15 with its
-/// server counterpart (`DELETE /me` and the cascade), because a delete button
-/// that half-works is worse than one that does not exist yet.
+/// Delete account (S15-U1): a two-step confirm that states what deletion does
+/// — including the cross-user effect in plain words — then shows the server's
+/// counts as the final receipt. Only then does the app sign out.
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
 
@@ -158,11 +158,15 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   icon: const Icon(Icons.logout),
                   label: const Text('Sign out'),
                 ),
-                const SizedBox(height: 16),
-                Text(
-                  'Deleting your account arrives in a later build step.',
-                  style: theme.textTheme.bodySmall,
-                  textAlign: TextAlign.center,
+                const SizedBox(height: 24),
+                Text('Danger zone', style: theme.textTheme.titleMedium),
+                const SizedBox(height: 8),
+                OutlinedButton.icon(
+                  style: OutlinedButton.styleFrom(
+                      foregroundColor: theme.colorScheme.error),
+                  onPressed: _busy ? null : _deleteAccount,
+                  icon: const Icon(Icons.delete_forever_outlined),
+                  label: const Text('Delete my account'),
                 ),
                 const SizedBox(height: 32),
               ],
@@ -171,6 +175,99 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         ),
       ),
     );
+  }
+
+  /// S15-U1. Step one says what deletion does; step two asks again with the
+  /// cross-user effect in plain words; the receipt is the server's own count.
+  Future<void> _deleteAccount() async {
+    final first = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Delete your account?'),
+        content: const Text(
+          'Everything you wrote, every trait the AI read from it, your AI self, '
+          'your analyses, your simulated dates and your chats — all of it goes, '
+          'for good. There is no undo.',
+        ),
+        actions: [
+          TextButton(
+              onPressed: () => Navigator.of(ctx).pop(false),
+              child: const Text('Keep my account')),
+          FilledButton(
+              onPressed: () => Navigator.of(ctx).pop(true),
+              child: const Text('Continue')),
+        ],
+      ),
+    );
+    if (first != true || !mounted) return;
+    final second = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('One more thing'),
+        content: const Text(
+          'Your simulated dates disappear from your friends’ results too, and '
+          'any chat they started with your AI self goes with them. They will '
+          'see “this person removed their account” where you used to be.\n\n'
+          'Delete everything?',
+        ),
+        actions: [
+          TextButton(
+              onPressed: () => Navigator.of(ctx).pop(false),
+              child: const Text('No, keep it')),
+          FilledButton(
+              style: FilledButton.styleFrom(
+                  backgroundColor: Theme.of(ctx).colorScheme.error),
+              onPressed: () => Navigator.of(ctx).pop(true),
+              child: const Text('Yes, delete everything')),
+        ],
+      ),
+    );
+    if (second != true || !mounted) return;
+
+    setState(() => _busy = true);
+    final messenger = ScaffoldMessenger.of(context);
+    DeletionReceipt receipt;
+    try {
+      receipt = await ref.read(authRepositoryProvider).deleteMe();
+    } on ApiException catch (e) {
+      if (mounted) setState(() => _busy = false);
+      messenger.showSnackBar(SnackBar(content: Text(e.message)));
+      return;
+    } catch (e) {
+      if (mounted) setState(() => _busy = false);
+      messenger.showSnackBar(SnackBar(content: Text('$e')));
+      return;
+    }
+    if (!mounted) return;
+    // The receipt: the server's own counts, taken before the cascade ran.
+    await showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Your account is gone'),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('${receipt.rowsRemoved} rows were removed:'),
+              const SizedBox(height: 8),
+              for (final e in receipt.deleted.entries)
+                if (e.value > 0)
+                  Text('${e.value} × ${e.key.replaceAll('_', ' ')}',
+                      style: Theme.of(ctx).textTheme.bodySmall),
+            ],
+          ),
+        ),
+        actions: [
+          FilledButton(
+              onPressed: () => Navigator.of(ctx).pop(),
+              child: const Text('Done')),
+        ],
+      ),
+    );
+    if (!mounted) return;
+    await ref.read(authControllerProvider.notifier).logOut();
   }
 
   Future<void> _editText({

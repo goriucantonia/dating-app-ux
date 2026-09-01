@@ -9,6 +9,7 @@ import '../../core/polling/poller.dart';
 import '../common/demo_chip.dart';
 import '../dates/date_checklist.dart';
 import '../dates/dates_repository.dart';
+import '../home/home_screen.dart' show removedCandidatesSentence;
 import '../traits/models.dart' show traitCategoryLabels, traitCategoryOrder;
 import 'analyses_repository.dart';
 import 'models.dart';
@@ -370,6 +371,18 @@ class _Reveal extends StatelessWidget {
           style: theme.textTheme.headlineSmall,
         ),
         const SizedBox(height: 8),
+        if (analysis.removedCandidates > 0)
+          // S15-U2: the gap, labeled. Their dates went with them.
+          Card(
+            color: theme.colorScheme.surfaceContainerHighest,
+            margin: const EdgeInsets.only(bottom: 8),
+            child: ListTile(
+              leading: const Icon(Icons.person_off_outlined),
+              title: Text(removedCandidatesSentence(analysis.removedCandidates)),
+              subtitle: const Text(
+                  'Their dates and scores went with them. What is left is real.'),
+            ),
+          ),
         if (partial)
           // S10-U10. Plain, not apologetic: a small pool is a fact about the
           // world, not a failure of the app.

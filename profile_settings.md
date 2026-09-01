@@ -23,7 +23,7 @@ Status: planning locked 2026-09-01. Server counterparts: `module_1_data_collecti
 - Long-press / hover → **"I'd never say that"** → optional "what would you say instead?" one-liner → `POST /calibration/messages/{id}/flag`. Flagged bubbles show a small mark; a footer counts flags and offers "Rebuild persona with these corrections."
 
 ### `/settings`
-- Opt-in toggle (`PATCH /me`) with its one-line description; account fields + preferences editing; theme; **Delete account** — a two-step confirm that states what deletion does, including the cross-user effect in plain words ("your simulated dates disappear from your friends' results too"), then shows the server's returned deletion counts as the final receipt.
+- Opt-in toggle (`PATCH /me`) with its one-line description; account fields + preferences editing; theme; **Delete account** — a two-step confirm that states what deletion does, including the cross-user effect in plain words ("your simulated dates disappear from your friends' results too"), then shows the server's returned deletion counts as the final receipt. *(Built 2026-09-01, Step 15: the receipt lists only non-zero tables, and the app signs out only after the receipt is dismissed — the person reads what went before they are back at the login screen.)*
 
 ## 2. Async behavior and data flow
 

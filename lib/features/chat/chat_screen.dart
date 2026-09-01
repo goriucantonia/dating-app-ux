@@ -33,6 +33,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   ChatSessionDetail? _detail;
   final List<ChatBubble> _bubbles = [];
   String? _loadError;
+  bool _gone = false;
   bool _loading = true;
   bool _sending = false;
   int _errorCounter = 0;
@@ -74,6 +75,10 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     } catch (e) {
       if (!mounted) return;
       setState(() {
+        // S15-U2: a chat that is gone is a person who left. The server
+        // cascades the session away with their account, so a 404 here is
+        // the tombstone, not an error.
+        _gone = e is ApiException && e.status == 404;
         _loadError = e is ApiException ? e.message : "Couldn't open this chat.";
         _loading = false;
       });
@@ -226,12 +231,24 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Icon(Icons.forum_outlined, size: 48),
+                          Icon(_gone ? Icons.person_off_outlined : Icons.forum_outlined,
+                              size: 48),
                           const SizedBox(height: 12),
-                          Text(_loadError!, textAlign: TextAlign.center),
+                          Text(
+                            _gone
+                                ? 'This person removed their account, so this '
+                                    'chat is gone with them.'
+                                : _loadError!,
+                            textAlign: TextAlign.center,
+                          ),
                           const SizedBox(height: 16),
-                          FilledButton(
-                              onPressed: _load, child: const Text('Try again')),
+                          if (_gone)
+                            FilledButton(
+                                onPressed: () => context.go('/chat'),
+                                child: const Text('Back to your chats'))
+                          else
+                            FilledButton(
+                                onPressed: _load, child: const Text('Try again')),
                         ],
                       ),
                     ),

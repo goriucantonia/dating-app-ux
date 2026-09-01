@@ -8,6 +8,7 @@ import '../../core/polling/poller.dart';
 import '../analyses/models.dart';
 import '../chat/chat_repository.dart';
 import '../common/demo_chip.dart';
+import '../home/home_screen.dart' show removedCandidatesSentence;
 import 'curves.dart';
 import 'date_checklist.dart';
 import 'dates_repository.dart';
@@ -129,6 +130,15 @@ class _Body extends StatelessWidget {
                     'The transcripts are safe and you can read them.',
                 style: TextStyle(color: theme.colorScheme.onErrorContainer),
               ),
+            ),
+          ),
+        if (a.removedCandidates > 0)
+          Card(
+            color: theme.colorScheme.surfaceContainerHighest,
+            child: ListTile(
+              leading: const Icon(Icons.person_off_outlined),
+              title: Text(removedCandidatesSentence(a.removedCandidates)),
+              subtitle: const Text('Their dates and scores went with them.'),
             ),
           ),
         const SizedBox(height: 8),

@@ -20,6 +20,10 @@ Three zones, top to bottom:
 - History is a plain fetch-on-focus provider. The in-flight analysis card subscribes to the shared app-wide `Poller` — the same instance the progress screen uses, so leaving and returning to the dashboard never spawns a second polling loop.
 - `no_candidates` renders as an honest, calm card: "No one in the pool fits your filters yet" with the pool explanation from the server — not an error, not a retry-spinner.
 
+## 2a. Built 2026-09-01 (Step 15)
+
+- Tombstones read `removed_candidates` from the analysis payload: the history row and the analysis screen say "One person in this analysis removed their account." (pluralised), and the results screen adds "Their dates and scores went with them." The sentence lives in one function (`removedCandidatesSentence`) so three screens cannot phrase it three ways.
+
 ## 3. Decisions (trades named)
 
 1. **No user browsing on the dashboard** — reaffirms the feed cut; the toggle lives in Settings. The dashboard sells exactly one action.

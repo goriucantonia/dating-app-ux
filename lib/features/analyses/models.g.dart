@@ -59,6 +59,7 @@ _Analysis _$AnalysisFromJson(Map<String, dynamic> json) => _Analysis(
           ?.map((e) => Candidate.fromJson(e as Map<String, dynamic>))
           .toList() ??
       const <Candidate>[],
+  removedCandidates: (json['removed_candidates'] as num?)?.toInt() ?? 0,
   message: json['message'] as String?,
   progress: json['progress'] as Map<String, dynamic>?,
 );
@@ -70,6 +71,7 @@ Map<String, dynamic> _$AnalysisToJson(_Analysis instance) => <String, dynamic>{
   'error': instance.error,
   'created_at': instance.createdAt,
   'candidates': instance.candidates,
+  'removed_candidates': instance.removedCandidates,
   'message': instance.message,
   'progress': instance.progress,
 };

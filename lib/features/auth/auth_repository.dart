@@ -40,6 +40,18 @@ class AuthRepository {
     return User.fromJson(r.data!);
   }
 
+  /// S15-U1. Returns the server's receipt: the per-table counts it logged
+  /// BEFORE the cascade ran. The session is dead after this.
+  Future<DeletionReceipt> deleteMe() async {
+    final r = await _wrap(() => _dio.delete<Map<String, dynamic>>('/me'));
+    final deleted = (r.data!['deleted'] as Map).map(
+        (k, v) => MapEntry(k as String, (v as num).toInt()));
+    return DeletionReceipt(
+      deleted: deleted,
+      rowsRemoved: (r.data!['rows_removed'] as num).toInt(),
+    );
+  }
+
   Future<T> _wrap<T>(Future<T> Function() call) async {
     try {
       return await call();
@@ -47,6 +59,14 @@ class AuthRepository {
       throw ApiException.from(e);
     }
   }
+}
+
+/// The deletion receipt (S15-B2): what went, per table, counted before it went.
+class DeletionReceipt {
+  const DeletionReceipt({required this.deleted, required this.rowsRemoved});
+
+  final Map<String, int> deleted;
+  final int rowsRemoved;
 }
 
 final authRepositoryProvider =

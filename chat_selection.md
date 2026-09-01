@@ -31,6 +31,8 @@ Status: planning locked 2026-09-01. Server counterpart: `chat.md`. Final UX modu
 - **The shared chat widget gained three parameters, not branches:** `typingLabel` (the typing indicator), `composerEnabled` (an ended chat keeps its history and loses its composer), and `ChatBubble.isError` (a centred notice that can never be mistaken for a spoken line). Calibration passes none of them and is unchanged.
 - **The selection footer reads the session list to render "already chose [name]"** — one provider (`selectionForAnalysisProvider`) derives it, so the results screen and the chat list cannot disagree about whether a choice was made.
 
+- **A vanished chat is a person who left** (built 2026-09-01, Step 15). The server cascades the session away with the match's account, so opening it is a 404; the chat screen renders "This person removed their account, so this chat is gone with them." with a way back to the list, never a retry button over a row that will not come back.
+
 ## 3. Decisions (trades named)
 
 1. **Confirm sheet before selection.** Cost: one extra tap on the app's climactic action. Accepted: it's the one irreversible choice in an analysis, and it's where the not-notified honesty must land — after this, the app behaves as if a relationship exists.

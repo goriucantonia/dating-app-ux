@@ -48,6 +48,10 @@ abstract class Analysis with _$Analysis {
     String? error,
     @JsonKey(name: 'created_at') required String createdAt,
     @Default(<Candidate>[]) List<Candidate> candidates,
+    // S15-B3: how many of this analysis's people have since deleted their
+    // accounts. Their rows are gone; the analysis survives with a gap, and
+    // every screen that renders it says so (S15-U2).
+    @JsonKey(name: 'removed_candidates') @Default(0) int removedCandidates,
     String? message,
     // The simulation pipeline's real stage, in the sentence the server wrote
     // (S11-B10). Deliberately untyped: the stage NAMES are the server's to
