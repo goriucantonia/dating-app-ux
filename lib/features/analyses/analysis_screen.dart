@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../app/layout_shell.dart';
+import '../../app/nav_shell.dart';
 import '../../core/api/api_client.dart';
 import '../../core/notify/local_notification.dart';
 import '../../core/polling/poller.dart';
@@ -40,10 +41,7 @@ class AnalysisScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Finding the right person'),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.go('/'),
-        ),
+        leading: const BackTo(fallback: '/'),
       ),
       body: LayoutShell(
         child: state.when(
@@ -403,7 +401,14 @@ class _Reveal extends StatelessWidget {
         for (var i = 0; i < analysis.candidates.length; i++)
           _StaggeredIn(
             index: i,
-            child: _CandidateCard(candidate: analysis.candidates[i]),
+            child: _CandidateCard(
+              candidate: analysis.candidates[i],
+              analysisId: analysis.id,
+              // S17-U2: the swap exists only before the dates run. The server
+              // refuses it in every other state, and a button that can only
+              // ever fail is worse than no button (§11).
+              canReject: analysis.status == 'matched',
+            ),
           ),
         const SizedBox(height: 20),
         // S10-U12: an explicit button, NOT auto-chained. The reveal is a
@@ -454,17 +459,106 @@ class _StaggeredIn extends StatelessWidget {
   }
 }
 
-class _CandidateCard extends StatefulWidget {
-  const _CandidateCard({required this.candidate});
+class _CandidateCard extends ConsumerStatefulWidget {
+  const _CandidateCard({
+    required this.candidate,
+    required this.analysisId,
+    required this.canReject,
+  });
 
   final Candidate candidate;
+  final String analysisId;
+  final bool canReject;
 
   @override
-  State<_CandidateCard> createState() => _CandidateCardState();
+  ConsumerState<_CandidateCard> createState() => _CandidateCardState();
 }
 
-class _CandidateCardState extends State<_CandidateCard> {
+class _CandidateCardState extends ConsumerState<_CandidateCard> {
   bool _expanded = false;
+  bool _busy = false;
+
+  /// S17-U2. Turning someone down is confirmed once, and the confirmation
+  /// says the two things the user cannot see for themselves: it does not
+  /// come back, and somebody else may or may not be waiting.
+  Future<void> _reject() async {
+    final name = widget.candidate.displayName;
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text('Not $name?'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              "They're out of this analysis for good — you can't put them "
+              'back into it later.',
+              style: Theme.of(ctx).textTheme.bodyMedium,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'The next person who fits takes their place. If nobody else '
+              "fits, you'll be told and nothing changes.",
+              style: Theme.of(ctx).textTheme.bodyMedium,
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: Text('Keep $name'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: const Text('Swap them out'),
+          ),
+        ],
+      ),
+    );
+    if (ok != true || !mounted) return;
+
+    setState(() => _busy = true);
+    final messenger = ScaffoldMessenger.of(context);
+    final before = {
+      for (final c in ref.read(analysisPollerProvider(widget.analysisId)).valueOrNull
+              ?.candidates ??
+          const <Candidate>[])
+        c.candidateUserId,
+    };
+    try {
+      final updated = await ref
+          .read(analysesRepositoryProvider)
+          .rejectCandidate(widget.analysisId, widget.candidate.candidateUserId);
+      // The server answered with the new line-up; the poller's copy is now
+      // one version behind, so it is told rather than left to catch up on its
+      // next tick.
+      await ref
+          .read(analysisPollerProvider(widget.analysisId).notifier)
+          .refreshNow();
+      final arrived = updated.candidates
+          .where((c) => !before.contains(c.candidateUserId))
+          .toList();
+      messenger.showSnackBar(SnackBar(
+        content: Text(
+          arrived.isEmpty
+              ? '$name is out. Nobody else fits right now, so you have '
+                  '${updated.candidates.length} '
+                  '${updated.candidates.length == 1 ? "person" : "people"}.'
+              : '$name is out. ${arrived.first.displayName} takes their place.',
+        ),
+      ));
+    } on ApiException catch (e) {
+      // The server's own sentence, verbatim — "the dates are already running",
+      // "they're the only person left". Refusals are state, not failure.
+      messenger.showSnackBar(SnackBar(content: Text(e.message)));
+    } catch (e) {
+      // Every submit ends in a visible outcome (D-005).
+      messenger.showSnackBar(SnackBar(content: Text('$e')));
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -529,13 +623,21 @@ class _CandidateCardState extends State<_CandidateCard> {
             // verbatim for the same reason.
             Text(c.reasonSummary, style: theme.textTheme.bodyMedium),
             const SizedBox(height: 4),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: TextButton.icon(
-                onPressed: () => setState(() => _expanded = !_expanded),
-                icon: Icon(_expanded ? Icons.expand_less : Icons.expand_more),
-                label: Text(_expanded ? 'Hide breakdown' : 'Why them?'),
-              ),
+            Wrap(
+              spacing: 8,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              children: [
+                TextButton.icon(
+                  onPressed: () => setState(() => _expanded = !_expanded),
+                  icon: Icon(_expanded ? Icons.expand_less : Icons.expand_more),
+                  label: Text(_expanded ? 'Hide breakdown' : 'Why them?'),
+                ),
+                if (widget.canReject)
+                  TextButton(
+                    onPressed: _busy ? null : _reject,
+                    child: Text(_busy ? 'Swapping…' : 'Not this one'),
+                  ),
+              ],
             ),
             if (_expanded) _Breakdown(candidate: c),
           ],

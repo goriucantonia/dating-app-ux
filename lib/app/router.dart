@@ -3,11 +3,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../core/auth/auth_controller.dart';
+import 'nav_shell.dart';
 import '../features/auth/login_screen.dart';
 import '../features/auth/register_screen.dart';
 import '../features/chat/chat_list_screen.dart';
 import '../features/chat/chat_screen.dart';
 import '../features/home/home_screen.dart';
+import '../features/questions/correction_screen.dart';
 import '../features/questions/expand_screen.dart';
 import '../features/analyses/analysis_screen.dart';
 import '../features/dates/results_screen.dart';
@@ -59,7 +61,8 @@ final routerProvider = Provider<GoRouter>((ref) {
       return null;
     },
     routes: [
-      GoRoute(path: '/', builder: (_, _) => const HomeScreen()),
+      // Outside the shell: the three screens where a navigation bar would be
+      // an invitation to leave something half-finished.
       GoRoute(path: '/login', builder: (_, _) => const LoginScreen()),
       GoRoute(path: '/register', builder: (_, _) => const RegisterScreen()),
       GoRoute(
@@ -68,42 +71,84 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
           path: '/onboarding/building',
           builder: (_, _) => const BuildingScreen()),
-      GoRoute(path: '/profile', builder: (_, _) => const ProfileScreen()),
-      GoRoute(
-          path: '/profile/calibration',
-          builder: (_, _) => const CalibrationScreen()),
-      GoRoute(
-          path: '/profile/expand', builder: (_, _) => const ExpandScreen()),
-      GoRoute(path: '/settings', builder: (_, _) => const SettingsScreen()),
-      // S10-U7/U13: ONE route, phase-switched by the analysis status, so a
-      // deep link lands correctly whatever phase the run is in.
-      GoRoute(
-        path: '/analyses/:id',
-        builder: (_, state) =>
-            AnalysisScreen(analysisId: state.pathParameters['id']!),
-        routes: [
-          // S13-U10: the results dashboard.
-          GoRoute(
-            path: 'results',
-            builder: (_, state) =>
-                ResultsScreen(analysisId: state.pathParameters['id']!),
-          ),
+
+      // S18-U1: everything else lives under the ONE persistent navigation,
+      // four branches, each with its own stack. A screen nested under a
+      // branch keeps the bar AND gets a working back button — the two things
+      // the old flat route list had neither of.
+      StatefulShellRoute.indexedStack(
+        builder: (_, _, shell) => NavShell(shell: shell),
+        branches: [
+          StatefulShellBranch(routes: [
+            GoRoute(
+              path: '/',
+              builder: (_, _) => const HomeScreen(),
+              routes: [
+                // S10-U7/U13: ONE route, phase-switched by the analysis
+                // status, so a deep link lands correctly whatever phase the
+                // run is in.
+                GoRoute(
+                  path: 'analyses/:id',
+                  builder: (_, state) =>
+                      AnalysisScreen(analysisId: state.pathParameters['id']!),
+                  routes: [
+                    // S13-U10: the results dashboard.
+                    GoRoute(
+                      path: 'results',
+                      builder: (_, state) =>
+                          ResultsScreen(analysisId: state.pathParameters['id']!),
+                    ),
+                  ],
+                ),
+                // S13-U6/U9: the transcript viewer, with `?seq=` as its anchor.
+                GoRoute(
+                  path: 'dates/:id',
+                  builder: (_, state) => TranscriptScreen(
+                    dateId: state.pathParameters['id']!,
+                    anchorSeq:
+                        int.tryParse(state.uri.queryParameters['seq'] ?? ''),
+                  ),
+                ),
+              ],
+            ),
+          ]),
+          StatefulShellBranch(routes: [
+            GoRoute(
+              path: '/profile',
+              builder: (_, _) => const ProfileScreen(),
+              routes: [
+                GoRoute(
+                    path: 'calibration',
+                    builder: (_, _) => const CalibrationScreen()),
+                GoRoute(path: 'expand', builder: (_, _) => const ExpandScreen()),
+                // S18-U3: the disputed trait's own question, answered on its
+                // own screen. It used to be "somewhere in /profile/expand",
+                // which is to say nowhere.
+                GoRoute(
+                  path: 'correct/:questionId',
+                  builder: (_, state) => CorrectionScreen(
+                      questionId: state.pathParameters['questionId']!),
+                ),
+              ],
+            ),
+          ]),
+          StatefulShellBranch(routes: [
+            GoRoute(
+              path: '/chat',
+              builder: (_, _) => const ChatListScreen(),
+              routes: [
+                GoRoute(
+                  path: ':sessionId',
+                  builder: (_, state) => ChatScreen(
+                      sessionId: state.pathParameters['sessionId']!),
+                ),
+              ],
+            ),
+          ]),
+          StatefulShellBranch(routes: [
+            GoRoute(path: '/settings', builder: (_, _) => const SettingsScreen()),
+          ]),
         ],
-      ),
-      // S14-U3/U4: the session list and the live chat.
-      GoRoute(path: '/chat', builder: (_, _) => const ChatListScreen()),
-      GoRoute(
-        path: '/chat/:sessionId',
-        builder: (_, state) =>
-            ChatScreen(sessionId: state.pathParameters['sessionId']!),
-      ),
-      // S13-U6/U9: the transcript viewer, with `?seq=` as its anchor.
-      GoRoute(
-        path: '/dates/:id',
-        builder: (_, state) => TranscriptScreen(
-          dateId: state.pathParameters['id']!,
-          anchorSeq: int.tryParse(state.uri.queryParameters['seq'] ?? ''),
-        ),
       ),
     ],
   );

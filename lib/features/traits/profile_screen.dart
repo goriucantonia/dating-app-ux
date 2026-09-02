@@ -3,8 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../app/layout_shell.dart';
+import '../../app/theme.dart';
 import '../../core/api/api_client.dart';
 import '../persona/persona_repository.dart';
+import '../questions/models.dart' show Question;
 import '../questions/questions_providers.dart';
 import 'models.dart';
 import 'traits_repository.dart';
@@ -20,13 +22,6 @@ class ProfileScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Your profile'),
-        actions: [
-          IconButton(
-            tooltip: 'Settings',
-            icon: const Icon(Icons.settings),
-            onPressed: () => context.go('/settings'),
-          ),
-        ],
       ),
       body: LayoutShell(
         child: RefreshIndicator(
@@ -97,22 +92,96 @@ class _Body extends ConsumerWidget {
       children: [
         const _PersonaHeaderSlot(),
         const SizedBox(height: 8),
+        // S18-U3: corrections you started and have not finished, at the top of
+        // the screen they belong to. This is the "you won't have to go
+        // looking for it" the dispute dialog promises.
+        const _WaitingCorrections(),
         // S8-U9: expansion is reachable from the profile now that there is a
         // trait list for it to visibly change.
         OutlinedButton.icon(
-          onPressed: () => context.go('/profile/expand'),
+          onPressed: () => context.push('/profile/expand'),
           icon: const Icon(Icons.add_comment),
           label: const Text('Answer more questions'),
         ),
         const SizedBox(height: 8),
         FilledButton.tonalIcon(
-          onPressed: () => context.go('/profile/calibration'),
+          onPressed: () => context.push('/profile/calibration'),
           icon: const Icon(Icons.forum),
           label: const Text('Talk to your AI self'),
         ),
         ...sections,
         const SizedBox(height: 32),
       ],
+    );
+  }
+}
+
+/// S18-U3. Every dispute question the user has not answered yet, listed where
+/// they will see it: at the top of the profile the disputed trait sits on.
+///
+/// Renders nothing at all when there is nothing waiting — an empty "0
+/// corrections" block would be noise on the screen a person visits most.
+class _WaitingCorrections extends ConsumerWidget {
+  const _WaitingCorrections();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final questions = ref.watch(questionsProvider);
+    final waiting = (questions.valueOrNull ?? const <Question>[])
+        .where((q) => q.origin == 'dispute' && !q.answered)
+        .toList();
+    if (waiting.isEmpty) return const SizedBox.shrink();
+
+    final theme = Theme.of(context);
+    final m = Modernist.of(context);
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(14),
+      color: m.tint,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Kicker(
+            waiting.length == 1
+                ? '1 correction waiting'
+                : '${waiting.length} corrections waiting',
+            colour: m.onTint,
+          ),
+          const SizedBox(height: 6),
+          Text(
+            'You told us the AI got something wrong. Answering this is how it '
+            'learns what is actually true.',
+            style: theme.textTheme.bodySmall?.copyWith(color: m.onTint),
+          ),
+          const SizedBox(height: 10),
+          for (final q in waiting)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 6),
+              child: InkWell(
+                onTap: () => context.push('/profile/correct/${q.id}'),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        q.text,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: theme.textTheme.bodyMedium
+                            ?.copyWith(color: m.onTint),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Text('Answer →',
+                        style: theme.textTheme.labelSmall
+                            ?.copyWith(color: m.onTint)),
+                  ],
+                ),
+              ),
+            ),
+        ],
+      ),
     );
   }
 }
@@ -293,21 +362,28 @@ class _TraitCardState extends ConsumerState<_TraitCard> {
       // S8-U3: tell them a question was added, and take them to it. A dispute
       // that only recolours a card leaves the user with no way to correct
       // anything, which is the opposite of what they just asked for.
-      messenger.showSnackBar(
-        SnackBar(
-          content: const Text('Added a question so you can put it right.'),
-          action: SnackBarAction(
-            label: 'Answer it',
-            onPressed: () => router.go('/profile/expand'),
-          ),
-          duration: const Duration(seconds: 6),
-        ),
-      );
+      // S18-U3. NO snackbar promising a question the user then has to hunt
+      // for: the dialog IS the question, and both roads out of it lead
+      // somewhere that exists. "Later" is honest because the profile now
+      // carries a waiting-corrections banner that leads back here.
       await showDialog<void>(
         context: context,
         builder: (ctx) => AlertDialog(
           title: const Text('Tell us what’s actually true'),
-          content: Text(result.questionText),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(result.questionText,
+                  style: Theme.of(ctx).textTheme.bodyMedium),
+              const SizedBox(height: 12),
+              Text(
+                'It’s waiting on your profile until you do — you won’t have to '
+                'go looking for it.',
+                style: Theme.of(ctx).textTheme.bodySmall,
+              ),
+            ],
+          ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(ctx).pop(),
@@ -316,7 +392,7 @@ class _TraitCardState extends ConsumerState<_TraitCard> {
             FilledButton(
               onPressed: () {
                 Navigator.of(ctx).pop();
-                router.go('/profile/expand');
+                router.push('/profile/correct/${result.questionId}');
               },
               child: const Text('Answer now'),
             ),
@@ -400,7 +476,7 @@ class _TraitCardState extends ConsumerState<_TraitCard> {
                     onPressed: _confirm, child: const Text("That's right")),
               ] else if (_status == 'disputed')
                 TextButton(
-                    onPressed: () => context.go('/profile/expand'),
+                    onPressed: () => context.push('/profile/expand'),
                     child: const Text('Answer the question')),
             ],
           ),

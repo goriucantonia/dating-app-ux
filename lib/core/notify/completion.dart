@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
 import '../../features/analyses/models.dart';
 import 'local_notification.dart';
@@ -18,10 +17,26 @@ final scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
 
 /// Wraps the router's pages; shows the in-app banner and fires the local
 /// notification when an analysis the app was watching finishes.
+///
+/// **[onOpen] is passed in, not looked up (D-019).** This widget lives in
+/// `MaterialApp.router`'s `builder`, which wraps the router's output from
+/// ABOVE — so there is no `InheritedGoRouter` anywhere in its ancestry, and
+/// `GoRouter.of(context)` from here (or from the messenger's context, which is
+/// higher still) throws. The button did nothing, and because the throw
+/// happened inside the action callback, `SnackBarAction` never got to dismiss
+/// its own snackbar either. Whoever builds the app has the router in hand;
+/// handing it over is both correct and one less thing to be wrong at runtime.
 class CompletionListener extends ConsumerWidget {
-  const CompletionListener({super.key, required this.child});
+  const CompletionListener({
+    super.key,
+    required this.child,
+    required this.onOpen,
+  });
 
   final Widget child;
+
+  /// Navigate to a route. `GoRouter.go` in the app; a recorder in tests.
+  final void Function(String route) onOpen;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -35,7 +50,8 @@ class CompletionListener extends ConsumerWidget {
       notifyLocal(title: title, body: body);
       final target =
           failed ? '/analyses/${next.id}' : '/analyses/${next.id}/results';
-      scaffoldMessengerKey.currentState
+      final messenger = scaffoldMessengerKey.currentState;
+      messenger
         ?..hideCurrentSnackBar()
         ..showSnackBar(
           SnackBar(
@@ -44,10 +60,14 @@ class CompletionListener extends ConsumerWidget {
             action: SnackBarAction(
               label: failed ? 'Open' : 'See results',
               onPressed: () {
-                // The router lives above this widget; use the messenger's
-                // own context, which is inside MaterialApp.router.
-                final ctx = scaffoldMessengerKey.currentContext;
-                if (ctx != null) GoRouter.of(ctx).go(target);
+                // Dismiss FIRST. If the navigation throws, the banner must
+                // still go — a notice you cannot get rid of without reloading
+                // the page is worse than the thing it was announcing.
+                messenger.hideCurrentSnackBar();
+                // Consumed: this event has been acted on, so a later rebuild
+                // of this listener must not resurrect the same banner.
+                ref.read(finishedAnalysisProvider.notifier).state = null;
+                onOpen(target);
               },
             ),
           ),

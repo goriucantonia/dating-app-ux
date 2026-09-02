@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
 import '../../app/layout_shell.dart';
+import '../../app/nav_shell.dart';
 import '../../core/api/api_client.dart';
 import '../../core/polling/poller.dart';
 import 'dates_repository.dart';
@@ -55,13 +55,10 @@ class _TranscriptScreenState extends ConsumerState<TranscriptScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(transcript.valueOrNull?.settingName ?? 'The date'),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.canPop()
-              ? context.pop()
-              : context.go(transcript.valueOrNull == null
-                  ? '/'
-                  : '/analyses/${transcript.valueOrNull!.analysisId}'),
+        leading: BackTo(
+          fallback: transcript.valueOrNull == null
+              ? '/'
+              : '/analyses/${transcript.valueOrNull!.analysisId}',
         ),
         actions: [
           // S13-U7: the ONE global switch. Persisted per user; both settings

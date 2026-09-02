@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../app/layout_shell.dart';
+import '../../app/nav_shell.dart';
 import '../../core/api/api_client.dart';
 import '../common/demo_chip.dart';
 import '../traits/models.dart' show traitCategoryLabels, traitCategoryOrder;
@@ -178,10 +179,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     final name = d?.match.displayName ?? 'Chat';
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.canPop() ? context.pop() : context.go('/chat'),
-        ),
+        leading: const BackTo(fallback: '/chat'),
         title: InkWell(
           onTap: d == null ? null : _openHeaderSheet,
           child: Row(

@@ -65,6 +65,26 @@ class AnalysesRepository {
     }
   }
 
+  /// S17-U1. Turn one candidate down before the dates run. The server picks
+  /// the replacement and answers with the whole analysis, so the caller
+  /// renders the new line-up from ONE response rather than polling for a swap
+  /// it cannot see happen.
+  ///
+  /// Every refusal (dates already running, last person left, not in this
+  /// analysis) arrives as an `ApiException` carrying the server's own
+  /// sentence. The wording is not re-written here: the server owns it so two
+  /// clients cannot disagree about why (§26).
+  Future<Analysis> rejectCandidate(String analysisId, String candidateUserId) async {
+    try {
+      final r = await _dio.post<Map<String, dynamic>>(
+        '/analyses/$analysisId/candidates/$candidateUserId/reject',
+      );
+      return Analysis.fromJson(r.data!);
+    } on DioException catch (e) {
+      throw ApiException.from(e);
+    }
+  }
+
   Future<List<Analysis>> history() async {
     try {
       final r = await _dio.get<Map<String, dynamic>>('/analyses');

@@ -330,6 +330,7 @@ Widget _app({
   required _FakeAnalyses analyses,
   required _FakeDates dates,
 }) {
+  final router = _router(initial);
   return ProviderScope(
     overrides: [
       authControllerProvider.overrideWith(_SignedIn.new),
@@ -337,9 +338,13 @@ Widget _app({
       datesRepositoryProvider.overrideWithValue(dates),
     ],
     child: MaterialApp.router(
-      routerConfig: _router(initial),
+      routerConfig: router,
       scaffoldMessengerKey: scaffoldMessengerKey,
-      builder: (context, child) => CompletionListener(child: child!),
+      // The same wiring as `App` (D-019): the listener is HANDED the router,
+      // because from inside `MaterialApp.router`'s builder there is none to
+      // look up.
+      builder: (context, child) =>
+          CompletionListener(onOpen: router.go, child: child!),
     ),
   );
 }
@@ -789,5 +794,49 @@ void main() {
     // Terminal: no third poll.
     await tester.pump(const Duration(seconds: 12));
     expect(analyses.gets, 2);
+  });
+
+  testWidgets('the banner button actually opens the results, and the banner '
+      'then goes away (D-019)', (tester) async {
+    // The report this pins: "the 'see results' button does not work, I needed
+    // to refresh the page to make it disappear." The banner had been asserted
+    // to APPEAR since Step 13 and never once tapped.
+    final running = _completeAnalysis.copyWith(
+      status: 'simulating',
+      progress: const {'stage': 'simulating', 'message': 'Simulating…'},
+    );
+    final analyses = _FakeAnalyses([running, _completeAnalysis]);
+    // A PHONE-sized view, not the tall one: a snackbar sits at the bottom of
+    // the window, and on a 4000px-tall test view it lands off-screen where a
+    // tap cannot reach it. That is the harness, not the product.
+    tester.view.physicalSize = const Size(800, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    await tester.pumpWidget(_app(
+      initial: '/',
+      analyses: analyses,
+      dates: _completeDates(),
+    ));
+    await tester.pumpAndSettle();
+    final container =
+        ProviderScope.containerOf(tester.element(find.text('home')));
+    container.listen(analysisPollerProvider('a1'), (_, _) {});
+    await tester.pump(const Duration(seconds: 4));
+    await tester.pump();
+    // Let the snackbar finish sliding up: mid-animation it is still below the
+    // bottom edge, and a tap there hits the page behind it.
+    await tester.pump(const Duration(milliseconds: 400));
+    expect(find.text('See results'), findsOneWidget);
+
+    await tester.tap(find.text('See results'));
+    await tester.pumpAndSettle();
+
+    // It navigated…
+    expect(find.byType(ResultsScreen), findsOneWidget);
+    // …the banner is gone without a page reload…
+    expect(find.text('See results'), findsNothing);
+    // …and the event is spent, so a rebuild cannot resurrect it.
+    expect(container.read(finishedAnalysisProvider), isNull);
   });
 }

@@ -6,6 +6,7 @@ import '../../app/layout_shell.dart';
 import '../../core/api/api_client.dart';
 import '../../core/auth/auth_controller.dart';
 import '../auth/auth_repository.dart';
+import '../auth/models.dart' show genderValues;
 
 /// `/settings` (S8-U8) — the opt-in toggle with its one-line description,
 /// editable preferences, and sign out.
@@ -46,11 +47,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     final theme = Theme.of(context);
     return Scaffold(
       appBar: AppBar(
+        // A tab root has no "back": the navigation bar is how you leave it
+        // (S18-U1). A back arrow here used to jump to /profile, which is not
+        // where the person came from.
         title: const Text('Settings'),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.go('/profile'),
-        ),
       ),
       body: LayoutShell(
         child: auth.when(
@@ -111,6 +111,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         enabled: false,
                       ),
                       ListTile(
+                        title: const Text('I am a…'),
+                        subtitle: Text(user.gender),
+                        trailing: const Icon(Icons.edit, size: 18),
+                        onTap: _busy ? null : () => _editGender(user.gender),
+                      ),
+                      ListTile(
                         title: const Text('City'),
                         subtitle: Text(user.city ?? 'Not set'),
                         trailing: const Icon(Icons.edit, size: 18),
@@ -143,12 +149,29 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 const SizedBox(height: 8),
                 Card(
                   margin: EdgeInsets.zero,
-                  child: ListTile(
-                    title: const Text('Age range'),
-                    subtitle:
-                        Text('${user.agePrefMin} – ${user.agePrefMax}'),
-                    trailing: const Icon(Icons.edit, size: 18),
-                    onTap: _busy ? null : () => _editAgeRange(user.agePrefMin, user.agePrefMax),
+                  child: Column(
+                    children: [
+                      // S19-U1: the field the whole matching filter turns on,
+                      // editable at last (D-020).
+                      ListTile(
+                        title: const Text('Interested in'),
+                        subtitle: Text(user.interestedIn.join(', ')),
+                        trailing: const Icon(Icons.edit, size: 18),
+                        onTap: _busy
+                            ? null
+                            : () => _editInterestedIn(user.interestedIn),
+                      ),
+                      ListTile(
+                        title: const Text('Age range'),
+                        subtitle:
+                            Text('${user.agePrefMin} – ${user.agePrefMax}'),
+                        trailing: const Icon(Icons.edit, size: 18),
+                        onTap: _busy
+                            ? null
+                            : () => _editAgeRange(
+                                user.agePrefMin, user.agePrefMax),
+                      ),
+                    ],
                   ),
                 ),
                 const SizedBox(height: 32),
@@ -298,6 +321,117 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     controller.dispose();
     if (value == null || value == initial) return;
     await _patch({field: value.isEmpty ? null : value});
+  }
+
+  /// S19-U1. Who you are interested in — the field that was collected at
+  /// registration, used as a HARD matching filter ever since, and had no way
+  /// to be changed (D-020). At least one must stay chosen, which is the
+  /// server's rule (`min_length=1`) enforced here as a disabled Save rather
+  /// than as a 422 the person has to read.
+  Future<void> _editInterestedIn(List<String> current) async {
+    final chosen = {...current};
+    final result = await showDialog<List<String>>(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setLocal) => AlertDialog(
+          title: const Text('Interested in'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Wrap(
+                spacing: 8,
+                children: [
+                  for (final g in genderValues)
+                    FilterChip(
+                      label: Text(g),
+                      selected: chosen.contains(g),
+                      onSelected: (sel) => setLocal(
+                          () => sel ? chosen.add(g) : chosen.remove(g)),
+                    ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Text(
+                'This decides who you can be matched with from now on. '
+                'Analyses that have already run keep the people they found.',
+                style: Theme.of(ctx).textTheme.bodySmall,
+              ),
+              if (chosen.isEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(top: 8),
+                  child: Text(
+                    'Pick at least one — with none chosen there is nobody to '
+                    'match you with.',
+                    style: TextStyle(color: Theme.of(ctx).colorScheme.error),
+                  ),
+                ),
+            ],
+          ),
+          actions: [
+            TextButton(
+                onPressed: () => Navigator.of(ctx).pop(),
+                child: const Text('Cancel')),
+            FilledButton(
+              onPressed: chosen.isEmpty
+                  ? null
+                  : () => Navigator.of(ctx).pop(chosen.toList()),
+              child: const Text('Save'),
+            ),
+          ],
+        ),
+      ),
+    );
+    if (result == null) return;
+    await _patch({'interested_in': result});
+  }
+
+  /// S19-U1. Your own gender, for the same reason: matching is MUTUAL, so
+  /// this is half of every filter, and it was as unchangeable as the other
+  /// half.
+  Future<void> _editGender(String current) async {
+    var picked = current;
+    final result = await showDialog<String>(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setLocal) => AlertDialog(
+          title: const Text('I am a…'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Wrap(
+                spacing: 8,
+                children: [
+                  for (final g in genderValues)
+                    ChoiceChip(
+                      label: Text(g),
+                      selected: picked == g,
+                      onSelected: (_) => setLocal(() => picked = g),
+                    ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Text(
+                'Other people’s preferences are matched against this, so it '
+                'changes who can be matched with you as well.',
+                style: Theme.of(ctx).textTheme.bodySmall,
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+                onPressed: () => Navigator.of(ctx).pop(),
+                child: const Text('Cancel')),
+            FilledButton(
+                onPressed: () => Navigator.of(ctx).pop(picked),
+                child: const Text('Save')),
+          ],
+        ),
+      ),
+    );
+    if (result == null || result == current) return;
+    await _patch({'gender': result});
   }
 
   Future<void> _editAgeRange(int min, int max) async {

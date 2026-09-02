@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 
 import '../../app/layout_shell.dart';
 import '../../core/api/api_client.dart';
-import '../../core/auth/auth_controller.dart';
 import '../../core/polling/poller.dart';
 import '../analyses/analyses_repository.dart';
 import '../analyses/models.dart';
@@ -26,23 +25,10 @@ class HomeScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Dating App AI'),
-        actions: [
-          IconButton(
-            tooltip: 'Your chats',
-            icon: const Icon(Icons.forum_outlined),
-            onPressed: () => context.go('/chat'),
-          ),
-          IconButton(
-            tooltip: 'Your profile',
-            icon: const Icon(Icons.person),
-            onPressed: () => context.go('/profile'),
-          ),
-          IconButton(
-            tooltip: 'Sign out',
-            icon: const Icon(Icons.logout),
-            onPressed: () => ref.read(authControllerProvider.notifier).logOut(),
-          ),
-        ],
+        // S18-U1: chats and profile are destinations in the navigation bar
+        // now, not icons hidden in a title bar. Sign-out lives in Settings,
+        // beside the other things that end a session.
+        actions: const [],
       ),
       body: LayoutShell(
         child: RefreshIndicator(
@@ -225,7 +211,7 @@ class _RunningCard extends ConsumerWidget {
     return Card(
       color: theme.colorScheme.surfaceContainerHighest,
       child: InkWell(
-        onTap: () => context.go('/analyses/$analysisId'),
+        onTap: () => context.push('/analyses/$analysisId'),
         child: Padding(
           padding: const EdgeInsets.all(20),
           child: Row(
@@ -275,7 +261,7 @@ class _LatestResultCard extends StatelessWidget {
     if (top == null) return const SizedBox.shrink();
     return Card(
       child: InkWell(
-        onTap: () => context.go('/analyses/${analysis.id}'),
+        onTap: () => context.push('/analyses/${analysis.id}'),
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Row(
@@ -339,7 +325,7 @@ class _HistoryRow extends StatelessWidget {
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 4),
       child: ListTile(
-        onTap: () => context.go('/analyses/${analysis.id}'),
+        onTap: () => context.push('/analyses/${analysis.id}'),
         title: Row(
           children: [
             Container(

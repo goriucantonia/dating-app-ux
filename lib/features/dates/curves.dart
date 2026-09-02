@@ -1,6 +1,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
+import '../../app/theme.dart';
 import 'models.dart';
 
 /// One reading of one agent's inner state at one message (S13-U12).
@@ -99,7 +100,6 @@ class _SatisfactionChartState extends State<SatisfactionChart> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final scheme = theme.colorScheme;
     final t = widget.transcript;
     final data = buildCurves(t);
     if (data.isEmpty) {
@@ -109,19 +109,24 @@ class _SatisfactionChartState extends State<SatisfactionChart> {
       );
     }
 
+    final mod = Modernist.of(context);
     final me = t.userDisplayName;
     final them = t.candidateDisplayName;
-    final userColour = scheme.primary;
-    final candColour = scheme.tertiary;
+    // The design's two-stroke convention, and it is a convention worth
+    // keeping: CONNECTION is the heavy solid line, SATISFACTION the light
+    // dashed one, and the two people are told apart by colour, not by dash —
+    // otherwise four dash patterns compete and none of them reads.
+    final userColour = mod.you;
+    final candColour = mod.them;
 
     LineChartBarData line(List<CurvePoint> pts, Color colour, bool dashed) =>
         LineChartBarData(
           spots: [for (final p in pts) FlSpot(p.seq.toDouble(), p.value)],
           color: colour,
-          barWidth: 2,
+          barWidth: dashed ? 1.5 : 2.5,
           isCurved: false,
           dotData: const FlDotData(show: false),
-          dashArray: dashed ? [6, 4] : null,
+          dashArray: dashed ? [4, 3] : null,
         );
 
     final scrubbed = _scrubSeq == null
@@ -132,26 +137,34 @@ class _SatisfactionChartState extends State<SatisfactionChart> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Wrap(
-          spacing: 12,
-          runSpacing: 4,
+          spacing: 16,
+          runSpacing: 6,
           children: [
-            _Legend(colour: userColour, label: '$me — enjoying it'),
-            _Legend(colour: userColour, label: '$me — feeling connected', dashed: true),
-            _Legend(colour: candColour, label: '$them — enjoying it'),
-            _Legend(colour: candColour, label: '$them — feeling connected', dashed: true),
-            _Legend(colour: scheme.outline, label: 'something happened', marker: true),
+            _Legend(colour: userColour, label: '$me · connected'),
+            _Legend(colour: userColour, label: '$me · enjoying it', dashed: true),
+            _Legend(colour: candColour, label: '$them · connected'),
+            _Legend(colour: candColour, label: '$them · enjoying it', dashed: true),
+            _Legend(colour: mod.muted, label: 'something happened', marker: true),
           ],
         ),
-        const SizedBox(height: 8),
-        SizedBox(
+        const SizedBox(height: 10),
+        Container(
           height: 200,
+          color: mod.plot,
+          padding: const EdgeInsets.only(top: 8, right: 8),
           child: LineChart(
             LineChartData(
               minX: 1,
               maxX: data.maxSeq.toDouble().clamp(2, double.infinity),
               minY: 0,
               maxY: 100,
-              gridData: const FlGridData(show: true, drawVerticalLine: false),
+              gridData: FlGridData(
+                show: true,
+                drawVerticalLine: false,
+                horizontalInterval: 25,
+                getDrawingHorizontalLine: (_) =>
+                    FlLine(color: mod.gridline, strokeWidth: 1),
+              ),
               borderData: FlBorderData(show: false),
               titlesData: FlTitlesData(
                 topTitles: const AxisTitles(),
@@ -176,10 +189,10 @@ class _SatisfactionChartState extends State<SatisfactionChart> {
                 ),
               ),
               lineBarsData: [
-                line(data.userSatisfaction, userColour, false),
-                line(data.userConnection, userColour, true),
-                line(data.candidateSatisfaction, candColour, false),
-                line(data.candidateConnection, candColour, true),
+                line(data.userSatisfaction, userColour, true),
+                line(data.userConnection, userColour, false),
+                line(data.candidateSatisfaction, candColour, true),
+                line(data.candidateConnection, candColour, false),
               ],
               // AC7: one vertical marker per environment row, at its seq.
               extraLinesData: ExtraLinesData(
@@ -187,9 +200,9 @@ class _SatisfactionChartState extends State<SatisfactionChart> {
                   for (final seq in data.eventSeqs)
                     VerticalLine(
                       x: seq.toDouble(),
-                      color: scheme.outline,
-                      strokeWidth: 1.5,
-                      dashArray: [4, 4],
+                      color: mod.them.withValues(alpha: 0.5),
+                      strokeWidth: 1,
+                      dashArray: [2, 3],
                     ),
                 ],
               ),
@@ -215,7 +228,18 @@ class _SatisfactionChartState extends State<SatisfactionChart> {
             ),
           ),
         ),
-        const SizedBox(height: 4),
+        const SizedBox(height: 6),
+        // The design's axis strip: where the evening started, what is being
+        // plotted, and where it ended — in the micro-label, under the plot.
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Kicker('Seq 1'),
+            const Kicker('Connection · satisfaction · 0—100'),
+            Kicker('Seq ${data.maxSeq}'),
+          ],
+        ),
+        const SizedBox(height: 8),
         Text(
           'What each AI reported feeling at that moment, 0–100. The models use '
           'these unevenly — they often sit at 0 while the conversation reads '
@@ -258,25 +282,64 @@ class _Legend extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
+        // The swatch draws the line it stands for: a dashed key for a dashed
+        // curve, so the legend does not have to say "(dashed)" in words.
         if (marker)
-          Container(width: 2, height: 12, color: colour)
+          CustomPaint(
+            size: const Size(1, 12),
+            painter: _DashPainter(colour: colour, vertical: true),
+          )
         else
-          SizedBox(
-            width: 18,
-            child: Divider(
-              color: colour,
-              thickness: 2,
-              height: 2,
-            ),
+          CustomPaint(
+            size: Size(18, dashed ? 1.5 : 2.5),
+            painter: _DashPainter(colour: colour, dashed: dashed),
           ),
-        const SizedBox(width: 4),
-        Text(
-          dashed ? '$label (dashed)' : label,
-          style: Theme.of(context).textTheme.labelSmall,
-        ),
+        const SizedBox(width: 6),
+        Text(label, style: Theme.of(context).textTheme.labelSmall),
       ],
     );
   }
+}
+
+/// The legend's key: a solid rule, a dashed rule, or the vertical dashed tick
+/// an environment event is drawn with. Same dash pattern as the chart, so the
+/// key and the curve are visibly the same stroke.
+class _DashPainter extends CustomPainter {
+  const _DashPainter({
+    required this.colour,
+    this.dashed = false,
+    this.vertical = false,
+  });
+
+  final Color colour;
+  final bool dashed;
+  final bool vertical;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = colour
+      ..strokeWidth = vertical ? 1 : size.height;
+    final length = vertical ? size.height : size.width;
+    if (!dashed && !vertical) {
+      canvas.drawLine(Offset(0, size.height / 2),
+          Offset(size.width, size.height / 2), paint);
+      return;
+    }
+    const on = 4.0, off = 3.0;
+    for (var pos = 0.0; pos < length; pos += on + off) {
+      final end = (pos + on).clamp(0.0, length);
+      canvas.drawLine(
+        vertical ? Offset(size.width / 2, pos) : Offset(pos, size.height / 2),
+        vertical ? Offset(size.width / 2, end) : Offset(end, size.height / 2),
+        paint,
+      );
+    }
+  }
+
+  @override
+  bool shouldRepaint(_DashPainter old) =>
+      old.colour != colour || old.dashed != dashed || old.vertical != vertical;
 }
 
 /// "What happened at message 14?" — the answer, one tap from the curve
@@ -300,30 +363,24 @@ class _ScrubPreview extends StatelessWidget {
       'candidate_agent' => transcript.candidateDisplayName,
       _ => 'Something happened',
     };
+    final m = Modernist.of(context);
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(10),
-      ),
+      padding: const EdgeInsets.all(14),
+      color: m.plot,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Message ${message.seq} · $who',
-              style: theme.textTheme.labelMedium),
-          const SizedBox(height: 4),
+          Kicker('Message ${message.seq} · $who', size: 11),
+          const SizedBox(height: 6),
           Text(message.reply,
               maxLines: 3,
               overflow: TextOverflow.ellipsis,
               style: theme.textTheme.bodyMedium),
-          Align(
-            alignment: Alignment.centerRight,
-            child: TextButton.icon(
-              onPressed: onOpen,
-              icon: const Icon(Icons.open_in_new, size: 16),
-              label: Text('Open at message ${message.seq}'),
-            ),
+          const SizedBox(height: 4),
+          TextButton(
+            onPressed: onOpen,
+            child: Text('Open at message ${message.seq} →'),
           ),
         ],
       ),
