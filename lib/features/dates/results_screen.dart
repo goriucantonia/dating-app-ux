@@ -673,15 +673,35 @@ class _DateResultState extends ConsumerState<_DateResult> {
           Text(endingSentence(status: d.status, endedBy: d.endedBy),
               style: theme.textTheme.bodySmall),
           // S13-U13: excluded / failed, with the reason, never smoothed over.
+          //
+          // REVISED 2026-09-02. This used to read "too short to judge — a date
+          // needs 10 turns to be scored at all", which is the sentence the
+          // owner removed the rule to stop showing. A short date is now judged
+          // and its thinness is reported as the judge's confidence; the only
+          // thing left in this branch is a date on which nobody spoke.
           if (d.excludedFromScore)
             _Note(
               tag: 'Not scored',
               colour: m.muted,
               text: d.status == 'failed'
                   ? 'Not scored — ${incompleteReason(d)}'
-                  : 'Not scored — too short to judge. ${d.turnCount} '
-                      'turn${d.turnCount == 1 ? '' : 's'} were spoken; a date '
-                      'needs 10 to be scored at all.',
+                  : 'Not scored — nothing was said. This date has no '
+                      'conversation in it to read.',
+            )
+          // A finished date the server considers judgeable but that has no
+          // evaluation stored. Reachable in bulk since 2026-09-02: dates
+          // excluded under the old ten-turn rule were never judged, and
+          // removing the rule made them judgeable without retroactively
+          // judging them. Saying "scored from a partial date" about one would
+          // be a claim that a score exists when none does (§10).
+          else if (e == null &&
+              (d.status == 'complete' || d.status == 'incomplete'))
+            _Note(
+              tag: 'Not yet scored',
+              colour: m.muted,
+              text: 'This date ran but has no score. It was skipped by the '
+                  'old “too short to judge” rule, which no longer applies — '
+                  're-running the analysis will score it.',
             )
           else if (d.status == 'incomplete')
             _Note(
@@ -716,6 +736,19 @@ class _DateResultState extends ConsumerState<_DateResult> {
                 colour: scheme.tertiary,
                 text: 'Scored from a partial date — weighted half.',
               ),
+            // How much the judge had to go on (2026-09-02). Shown BESIDE the
+            // score and never folded into it: one number meaning both "how it
+            // went" and "how much we saw" is a number nobody can read. Absent
+            // on evaluations written under judge_rubric.v1, which were never
+            // asked — and absence is rendered as absence, not as a zero.
+            if (e.confidence != null) ...[
+              const SizedBox(height: 10),
+              _ConfidenceLine(
+                confidence: e.confidence!,
+                note: e.evidenceNote,
+                turns: d.turnCount,
+              ),
+            ],
             const SizedBox(height: 10),
             if (e.verdictSummary.isNotEmpty)
               Text(e.verdictSummary, style: theme.textTheme.bodyMedium),
@@ -861,6 +894,81 @@ class _ClashSentence extends StatelessWidget {
 /// A caveat on a date, in the design's language: a square outlined tag naming
 /// the state, then the sentence. The tag replaces the old icon — an icon can
 /// only hint at "partial", where "PARTIAL · WEIGHTED ×0.5" says it.
+/// How much the judge had to go on, in words and as a bar (2026-09-02).
+///
+/// This is the thing that replaced "not scored — too short to judge". The
+/// score above it says how the evening went; this says how much evening there
+/// was to read, and the two are deliberately never combined. A person looking
+/// at 88 needs to be able to see whether it came from a full night or from
+/// four polite lines, and no single number can tell them both.
+///
+/// The bar is drawn from the judge's own `confidence`, not from the turn
+/// count: the turn count is how much was SAID and confidence is how much of it
+/// was revealing, which are not the same thing. The turn count is shown beside
+/// it as the check on that claim.
+class _ConfidenceLine extends StatelessWidget {
+  const _ConfidenceLine({
+    required this.confidence,
+    required this.note,
+    required this.turns,
+  });
+
+  final int confidence;
+  final String note;
+  final int turns;
+
+  /// Three bands, matching the three the server describes to the judge. Words
+  /// rather than a bare percentage, because "how confident is 62" is a
+  /// question a reader should not have to answer for themselves.
+  String get _band {
+    if (confidence >= 70) return 'Plenty to go on';
+    if (confidence >= 40) return 'Something to go on';
+    return 'Not much to go on';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final m = Modernist.of(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: Text(
+                '$_band · $confidence/100 · $turns '
+                'turn${turns == 1 ? '' : 's'} spoken',
+                style: theme.textTheme.labelSmall?.copyWith(color: m.muted),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 4),
+        // Deliberately not a progress indicator: this is not a thing filling
+        // up, it is a reading with a width.
+        LayoutBuilder(
+          builder: (context, constraints) => Stack(
+            children: [
+              Container(height: 3, width: constraints.maxWidth, color: m.rule),
+              Container(
+                height: 3,
+                width: constraints.maxWidth * (confidence.clamp(0, 100) / 100),
+                color: m.muted,
+              ),
+            ],
+          ),
+        ),
+        if (note.isNotEmpty) ...[
+          const SizedBox(height: 6),
+          Text(note,
+              style: theme.textTheme.bodySmall?.copyWith(color: m.muted)),
+        ],
+      ],
+    );
+  }
+}
+
 class _Note extends StatelessWidget {
   const _Note({required this.tag, required this.colour, required this.text});
 

@@ -13,6 +13,13 @@ abstract class Evaluation with _$Evaluation {
     required Map<String, dynamic> criteria,
     @JsonKey(name: 'date_score') required double dateScore,
     @JsonKey(name: 'is_partial') required bool isPartial,
+    // How much the transcript supported the judge's reading, 0-100, said by
+    // the judge (`judge_rubric.v2`). NULLABLE and it must stay so: evaluations
+    // written under v1 have none, and a 0 in its place would read as "the
+    // judge was certain of nothing" about a reading it was never asked to
+    // qualify. Rendered only when present.
+    int? confidence,
+    @JsonKey(name: 'evidence_note') @Default('') String evidenceNote,
     @JsonKey(name: 'clicked_subjects') @Default(<String>[]) List<String> clickedSubjects,
     @Default(<Clash>[]) List<Clash> clashes,
     @JsonKey(name: 'per_peer_summary') @Default(<String, dynamic>{}) Map<String, dynamic> perPeerSummary,
@@ -42,9 +49,13 @@ abstract class Clash with _$Clash {
 /// One date as `GET /analyses/{id}/dates` lists it.
 ///
 /// `excludedFromScore` and `endedBy` come from the SERVER and are never
-/// derived here: a client with its own copy of the 10-turn rule, or its own
-/// idea of what "mutual" means, is a client that can disagree with the score
-/// it is showing.
+/// derived here: a client with its own idea of what "mutual" means, or of when
+/// a date counts, is a client that can disagree with the score it is showing.
+///
+/// Since 2026-09-02 `excludedFromScore` means only "nobody spoke on this
+/// date". The ten-turn "too short to score" rule is gone — every date that has
+/// a transcript is judged, and how thin it was is reported as the judge's
+/// [Evaluation.confidence] rather than used to throw the date away.
 @freezed
 abstract class DateSummary with _$DateSummary {
   const factory DateSummary({
@@ -154,15 +165,20 @@ abstract class Transcript with _$Transcript {
 // The rubric, verbatim (S13-U10)
 // ---------------------------------------------------------------------------
 
-/// `judge_rubric.v1`'s weights, copied from `app/judging.py` so the results
+/// The judge rubric's weights, copied from `app/judging.py` so the results
 /// screen can show the arithmetic behind a score. Named trade: it exposes
 /// that the weights are opinions — and that is the point. A bare "78" invites
 /// blind trust or blind distrust; the breakdown invites reading the dates.
 ///
-/// If the server ever ships a v2, `Evaluation.rubricVersion` says so and this
-/// table must grow a second entry rather than be edited in place: old rows
-/// keep saying v1.
+/// **v2 shipped on 2026-09-02 and this table did NOT have to grow a second
+/// entry**, which is worth saying out loud since the note here promised it
+/// would. v2 changed what the judge is TOLD — judge every date however short,
+/// and report your own confidence — and added two fields. The four criteria
+/// and their four weights are untouched, so a v1 score and a v2 score are the
+/// same arithmetic over the same numbers and this table renders both
+/// correctly. A version that changed a weight would still need its own entry.
 const rubricVersionV1 = 'judge_rubric.v1';
+const rubricVersionV2 = 'judge_rubric.v2';
 
 class RubricCriterion {
   const RubricCriterion({

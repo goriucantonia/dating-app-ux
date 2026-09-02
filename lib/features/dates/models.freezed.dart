@@ -16,7 +16,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$Evaluation {
 
- Map<String, dynamic> get criteria;@JsonKey(name: 'date_score') double get dateScore;@JsonKey(name: 'is_partial') bool get isPartial;@JsonKey(name: 'clicked_subjects') List<String> get clickedSubjects; List<Clash> get clashes;@JsonKey(name: 'per_peer_summary') Map<String, dynamic> get perPeerSummary;@JsonKey(name: 'verdict_summary') String get verdictSummary;@JsonKey(name: 'judge_provider') String get judgeProvider;@JsonKey(name: 'judge_model') String get judgeModel;@JsonKey(name: 'rubric_version') String get rubricVersion;
+ Map<String, dynamic> get criteria;@JsonKey(name: 'date_score') double get dateScore;@JsonKey(name: 'is_partial') bool get isPartial; int? get confidence;@JsonKey(name: 'evidence_note') String get evidenceNote;@JsonKey(name: 'clicked_subjects') List<String> get clickedSubjects; List<Clash> get clashes;@JsonKey(name: 'per_peer_summary') Map<String, dynamic> get perPeerSummary;@JsonKey(name: 'verdict_summary') String get verdictSummary;@JsonKey(name: 'judge_provider') String get judgeProvider;@JsonKey(name: 'judge_model') String get judgeModel;@JsonKey(name: 'rubric_version') String get rubricVersion;
 /// Create a copy of Evaluation
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -30,20 +30,20 @@ $EvaluationCopyWith<Evaluation> get copyWith => _$EvaluationCopyWithImpl<Evaluat
 @override
 bool operator ==(Object other) {
   final _this = this as Evaluation;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Evaluation&&const DeepCollectionEquality().equals(other.criteria, _this.criteria)&&(identical(other.dateScore, _this.dateScore) || other.dateScore == _this.dateScore)&&(identical(other.isPartial, _this.isPartial) || other.isPartial == _this.isPartial)&&const DeepCollectionEquality().equals(other.clickedSubjects, _this.clickedSubjects)&&const DeepCollectionEquality().equals(other.clashes, _this.clashes)&&const DeepCollectionEquality().equals(other.perPeerSummary, _this.perPeerSummary)&&(identical(other.verdictSummary, _this.verdictSummary) || other.verdictSummary == _this.verdictSummary)&&(identical(other.judgeProvider, _this.judgeProvider) || other.judgeProvider == _this.judgeProvider)&&(identical(other.judgeModel, _this.judgeModel) || other.judgeModel == _this.judgeModel)&&(identical(other.rubricVersion, _this.rubricVersion) || other.rubricVersion == _this.rubricVersion));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Evaluation&&const DeepCollectionEquality().equals(other.criteria, _this.criteria)&&(identical(other.dateScore, _this.dateScore) || other.dateScore == _this.dateScore)&&(identical(other.isPartial, _this.isPartial) || other.isPartial == _this.isPartial)&&(identical(other.confidence, _this.confidence) || other.confidence == _this.confidence)&&(identical(other.evidenceNote, _this.evidenceNote) || other.evidenceNote == _this.evidenceNote)&&const DeepCollectionEquality().equals(other.clickedSubjects, _this.clickedSubjects)&&const DeepCollectionEquality().equals(other.clashes, _this.clashes)&&const DeepCollectionEquality().equals(other.perPeerSummary, _this.perPeerSummary)&&(identical(other.verdictSummary, _this.verdictSummary) || other.verdictSummary == _this.verdictSummary)&&(identical(other.judgeProvider, _this.judgeProvider) || other.judgeProvider == _this.judgeProvider)&&(identical(other.judgeModel, _this.judgeModel) || other.judgeModel == _this.judgeModel)&&(identical(other.rubricVersion, _this.rubricVersion) || other.rubricVersion == _this.rubricVersion));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
   final _this = this as Evaluation;
-  return Object.hash(runtimeType,const DeepCollectionEquality().hash(_this.criteria),_this.dateScore,_this.isPartial,const DeepCollectionEquality().hash(_this.clickedSubjects),const DeepCollectionEquality().hash(_this.clashes),const DeepCollectionEquality().hash(_this.perPeerSummary),_this.verdictSummary,_this.judgeProvider,_this.judgeModel,_this.rubricVersion);
+  return Object.hash(runtimeType,const DeepCollectionEquality().hash(_this.criteria),_this.dateScore,_this.isPartial,_this.confidence,_this.evidenceNote,const DeepCollectionEquality().hash(_this.clickedSubjects),const DeepCollectionEquality().hash(_this.clashes),const DeepCollectionEquality().hash(_this.perPeerSummary),_this.verdictSummary,_this.judgeProvider,_this.judgeModel,_this.rubricVersion);
 }
 
 @override
 String toString() {
   final _this = this as Evaluation;
-  return 'Evaluation(criteria: ${_this.criteria}, dateScore: ${_this.dateScore}, isPartial: ${_this.isPartial}, clickedSubjects: ${_this.clickedSubjects}, clashes: ${_this.clashes}, perPeerSummary: ${_this.perPeerSummary}, verdictSummary: ${_this.verdictSummary}, judgeProvider: ${_this.judgeProvider}, judgeModel: ${_this.judgeModel}, rubricVersion: ${_this.rubricVersion})';
+  return 'Evaluation(criteria: ${_this.criteria}, dateScore: ${_this.dateScore}, isPartial: ${_this.isPartial}, confidence: ${_this.confidence}, evidenceNote: ${_this.evidenceNote}, clickedSubjects: ${_this.clickedSubjects}, clashes: ${_this.clashes}, perPeerSummary: ${_this.perPeerSummary}, verdictSummary: ${_this.verdictSummary}, judgeProvider: ${_this.judgeProvider}, judgeModel: ${_this.judgeModel}, rubricVersion: ${_this.rubricVersion})';
 }
 
 
@@ -54,7 +54,7 @@ abstract mixin class $EvaluationCopyWith<$Res>  {
   factory $EvaluationCopyWith(Evaluation value, $Res Function(Evaluation) _then) = _$EvaluationCopyWithImpl;
 @useResult
 $Res call({
- Map<String, dynamic> criteria,@JsonKey(name: 'date_score') double dateScore,@JsonKey(name: 'is_partial') bool isPartial,@JsonKey(name: 'clicked_subjects') List<String> clickedSubjects, List<Clash> clashes,@JsonKey(name: 'per_peer_summary') Map<String, dynamic> perPeerSummary,@JsonKey(name: 'verdict_summary') String verdictSummary,@JsonKey(name: 'judge_provider') String judgeProvider,@JsonKey(name: 'judge_model') String judgeModel,@JsonKey(name: 'rubric_version') String rubricVersion
+ Map<String, dynamic> criteria,@JsonKey(name: 'date_score') double dateScore,@JsonKey(name: 'is_partial') bool isPartial, int? confidence,@JsonKey(name: 'evidence_note') String evidenceNote,@JsonKey(name: 'clicked_subjects') List<String> clickedSubjects, List<Clash> clashes,@JsonKey(name: 'per_peer_summary') Map<String, dynamic> perPeerSummary,@JsonKey(name: 'verdict_summary') String verdictSummary,@JsonKey(name: 'judge_provider') String judgeProvider,@JsonKey(name: 'judge_model') String judgeModel,@JsonKey(name: 'rubric_version') String rubricVersion
 });
 
 
@@ -71,12 +71,14 @@ class _$EvaluationCopyWithImpl<$Res>
 
 /// Create a copy of Evaluation
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? criteria = null,Object? dateScore = null,Object? isPartial = null,Object? clickedSubjects = null,Object? clashes = null,Object? perPeerSummary = null,Object? verdictSummary = null,Object? judgeProvider = null,Object? judgeModel = null,Object? rubricVersion = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? criteria = null,Object? dateScore = null,Object? isPartial = null,Object? confidence = freezed,Object? evidenceNote = null,Object? clickedSubjects = null,Object? clashes = null,Object? perPeerSummary = null,Object? verdictSummary = null,Object? judgeProvider = null,Object? judgeModel = null,Object? rubricVersion = null,}) {
   return _then(Evaluation(
 criteria: null == criteria ? _self.criteria : criteria // ignore: cast_nullable_to_non_nullable
 as Map<String, dynamic>,dateScore: null == dateScore ? _self.dateScore : dateScore // ignore: cast_nullable_to_non_nullable
 as double,isPartial: null == isPartial ? _self.isPartial : isPartial // ignore: cast_nullable_to_non_nullable
-as bool,clickedSubjects: null == clickedSubjects ? _self.clickedSubjects : clickedSubjects // ignore: cast_nullable_to_non_nullable
+as bool,confidence: freezed == confidence ? _self.confidence : confidence // ignore: cast_nullable_to_non_nullable
+as int?,evidenceNote: null == evidenceNote ? _self.evidenceNote : evidenceNote // ignore: cast_nullable_to_non_nullable
+as String,clickedSubjects: null == clickedSubjects ? _self.clickedSubjects : clickedSubjects // ignore: cast_nullable_to_non_nullable
 as List<String>,clashes: null == clashes ? _self.clashes : clashes // ignore: cast_nullable_to_non_nullable
 as List<Clash>,perPeerSummary: null == perPeerSummary ? _self.perPeerSummary : perPeerSummary // ignore: cast_nullable_to_non_nullable
 as Map<String, dynamic>,verdictSummary: null == verdictSummary ? _self.verdictSummary : verdictSummary // ignore: cast_nullable_to_non_nullable
@@ -168,10 +170,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( Map<String, dynamic> criteria, @JsonKey(name: 'date_score')  double dateScore, @JsonKey(name: 'is_partial')  bool isPartial, @JsonKey(name: 'clicked_subjects')  List<String> clickedSubjects,  List<Clash> clashes, @JsonKey(name: 'per_peer_summary')  Map<String, dynamic> perPeerSummary, @JsonKey(name: 'verdict_summary')  String verdictSummary, @JsonKey(name: 'judge_provider')  String judgeProvider, @JsonKey(name: 'judge_model')  String judgeModel, @JsonKey(name: 'rubric_version')  String rubricVersion)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( Map<String, dynamic> criteria, @JsonKey(name: 'date_score')  double dateScore, @JsonKey(name: 'is_partial')  bool isPartial,  int? confidence, @JsonKey(name: 'evidence_note')  String evidenceNote, @JsonKey(name: 'clicked_subjects')  List<String> clickedSubjects,  List<Clash> clashes, @JsonKey(name: 'per_peer_summary')  Map<String, dynamic> perPeerSummary, @JsonKey(name: 'verdict_summary')  String verdictSummary, @JsonKey(name: 'judge_provider')  String judgeProvider, @JsonKey(name: 'judge_model')  String judgeModel, @JsonKey(name: 'rubric_version')  String rubricVersion)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Evaluation() when $default != null:
-return $default(_that.criteria,_that.dateScore,_that.isPartial,_that.clickedSubjects,_that.clashes,_that.perPeerSummary,_that.verdictSummary,_that.judgeProvider,_that.judgeModel,_that.rubricVersion);case _:
+return $default(_that.criteria,_that.dateScore,_that.isPartial,_that.confidence,_that.evidenceNote,_that.clickedSubjects,_that.clashes,_that.perPeerSummary,_that.verdictSummary,_that.judgeProvider,_that.judgeModel,_that.rubricVersion);case _:
   return orElse();
 
 }
@@ -189,10 +191,10 @@ return $default(_that.criteria,_that.dateScore,_that.isPartial,_that.clickedSubj
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( Map<String, dynamic> criteria, @JsonKey(name: 'date_score')  double dateScore, @JsonKey(name: 'is_partial')  bool isPartial, @JsonKey(name: 'clicked_subjects')  List<String> clickedSubjects,  List<Clash> clashes, @JsonKey(name: 'per_peer_summary')  Map<String, dynamic> perPeerSummary, @JsonKey(name: 'verdict_summary')  String verdictSummary, @JsonKey(name: 'judge_provider')  String judgeProvider, @JsonKey(name: 'judge_model')  String judgeModel, @JsonKey(name: 'rubric_version')  String rubricVersion)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( Map<String, dynamic> criteria, @JsonKey(name: 'date_score')  double dateScore, @JsonKey(name: 'is_partial')  bool isPartial,  int? confidence, @JsonKey(name: 'evidence_note')  String evidenceNote, @JsonKey(name: 'clicked_subjects')  List<String> clickedSubjects,  List<Clash> clashes, @JsonKey(name: 'per_peer_summary')  Map<String, dynamic> perPeerSummary, @JsonKey(name: 'verdict_summary')  String verdictSummary, @JsonKey(name: 'judge_provider')  String judgeProvider, @JsonKey(name: 'judge_model')  String judgeModel, @JsonKey(name: 'rubric_version')  String rubricVersion)  $default,) {final _that = this;
 switch (_that) {
 case _Evaluation():
-return $default(_that.criteria,_that.dateScore,_that.isPartial,_that.clickedSubjects,_that.clashes,_that.perPeerSummary,_that.verdictSummary,_that.judgeProvider,_that.judgeModel,_that.rubricVersion);case _:
+return $default(_that.criteria,_that.dateScore,_that.isPartial,_that.confidence,_that.evidenceNote,_that.clickedSubjects,_that.clashes,_that.perPeerSummary,_that.verdictSummary,_that.judgeProvider,_that.judgeModel,_that.rubricVersion);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -209,10 +211,10 @@ return $default(_that.criteria,_that.dateScore,_that.isPartial,_that.clickedSubj
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( Map<String, dynamic> criteria, @JsonKey(name: 'date_score')  double dateScore, @JsonKey(name: 'is_partial')  bool isPartial, @JsonKey(name: 'clicked_subjects')  List<String> clickedSubjects,  List<Clash> clashes, @JsonKey(name: 'per_peer_summary')  Map<String, dynamic> perPeerSummary, @JsonKey(name: 'verdict_summary')  String verdictSummary, @JsonKey(name: 'judge_provider')  String judgeProvider, @JsonKey(name: 'judge_model')  String judgeModel, @JsonKey(name: 'rubric_version')  String rubricVersion)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( Map<String, dynamic> criteria, @JsonKey(name: 'date_score')  double dateScore, @JsonKey(name: 'is_partial')  bool isPartial,  int? confidence, @JsonKey(name: 'evidence_note')  String evidenceNote, @JsonKey(name: 'clicked_subjects')  List<String> clickedSubjects,  List<Clash> clashes, @JsonKey(name: 'per_peer_summary')  Map<String, dynamic> perPeerSummary, @JsonKey(name: 'verdict_summary')  String verdictSummary, @JsonKey(name: 'judge_provider')  String judgeProvider, @JsonKey(name: 'judge_model')  String judgeModel, @JsonKey(name: 'rubric_version')  String rubricVersion)?  $default,) {final _that = this;
 switch (_that) {
 case _Evaluation() when $default != null:
-return $default(_that.criteria,_that.dateScore,_that.isPartial,_that.clickedSubjects,_that.clashes,_that.perPeerSummary,_that.verdictSummary,_that.judgeProvider,_that.judgeModel,_that.rubricVersion);case _:
+return $default(_that.criteria,_that.dateScore,_that.isPartial,_that.confidence,_that.evidenceNote,_that.clickedSubjects,_that.clashes,_that.perPeerSummary,_that.verdictSummary,_that.judgeProvider,_that.judgeModel,_that.rubricVersion);case _:
   return null;
 
 }
@@ -224,7 +226,7 @@ return $default(_that.criteria,_that.dateScore,_that.isPartial,_that.clickedSubj
 @JsonSerializable()
 
 class _Evaluation implements Evaluation {
-  const _Evaluation({required  Map<String, dynamic> criteria, @JsonKey(name: 'date_score') required this.dateScore, @JsonKey(name: 'is_partial') required this.isPartial, @JsonKey(name: 'clicked_subjects')  List<String> clickedSubjects = const <String>[],  List<Clash> clashes = const <Clash>[], @JsonKey(name: 'per_peer_summary')  Map<String, dynamic> perPeerSummary = const <String, dynamic>{}, @JsonKey(name: 'verdict_summary') this.verdictSummary = '', @JsonKey(name: 'judge_provider') this.judgeProvider = '', @JsonKey(name: 'judge_model') this.judgeModel = '', @JsonKey(name: 'rubric_version') this.rubricVersion = ''}): _criteria = criteria,_clickedSubjects = clickedSubjects,_clashes = clashes,_perPeerSummary = perPeerSummary;
+  const _Evaluation({required  Map<String, dynamic> criteria, @JsonKey(name: 'date_score') required this.dateScore, @JsonKey(name: 'is_partial') required this.isPartial, this.confidence, @JsonKey(name: 'evidence_note') this.evidenceNote = '', @JsonKey(name: 'clicked_subjects')  List<String> clickedSubjects = const <String>[],  List<Clash> clashes = const <Clash>[], @JsonKey(name: 'per_peer_summary')  Map<String, dynamic> perPeerSummary = const <String, dynamic>{}, @JsonKey(name: 'verdict_summary') this.verdictSummary = '', @JsonKey(name: 'judge_provider') this.judgeProvider = '', @JsonKey(name: 'judge_model') this.judgeModel = '', @JsonKey(name: 'rubric_version') this.rubricVersion = ''}): _criteria = criteria,_clickedSubjects = clickedSubjects,_clashes = clashes,_perPeerSummary = perPeerSummary;
   factory _Evaluation.fromJson(Map<String, dynamic> json) => _$EvaluationFromJson(json);
 
  final  Map<String, dynamic> _criteria;
@@ -236,6 +238,8 @@ class _Evaluation implements Evaluation {
 
 @override@JsonKey(name: 'date_score') final  double dateScore;
 @override@JsonKey(name: 'is_partial') final  bool isPartial;
+@override final  int? confidence;
+@override@JsonKey(name: 'evidence_note') final  String evidenceNote;
  final  List<String> _clickedSubjects;
 @override@JsonKey(name: 'clicked_subjects') List<String> get clickedSubjects {
   if (_clickedSubjects is EqualUnmodifiableListView) return _clickedSubjects;
@@ -275,18 +279,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _Evaluation&&const DeepCollectionEquality().equals(other.criteria, _criteria)&&(identical(other.dateScore, dateScore) || other.dateScore == dateScore)&&(identical(other.isPartial, isPartial) || other.isPartial == isPartial)&&const DeepCollectionEquality().equals(other.clickedSubjects, _clickedSubjects)&&const DeepCollectionEquality().equals(other.clashes, _clashes)&&const DeepCollectionEquality().equals(other.perPeerSummary, _perPeerSummary)&&(identical(other.verdictSummary, verdictSummary) || other.verdictSummary == verdictSummary)&&(identical(other.judgeProvider, judgeProvider) || other.judgeProvider == judgeProvider)&&(identical(other.judgeModel, judgeModel) || other.judgeModel == judgeModel)&&(identical(other.rubricVersion, rubricVersion) || other.rubricVersion == rubricVersion));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _Evaluation&&const DeepCollectionEquality().equals(other.criteria, _criteria)&&(identical(other.dateScore, dateScore) || other.dateScore == dateScore)&&(identical(other.isPartial, isPartial) || other.isPartial == isPartial)&&(identical(other.confidence, confidence) || other.confidence == confidence)&&(identical(other.evidenceNote, evidenceNote) || other.evidenceNote == evidenceNote)&&const DeepCollectionEquality().equals(other.clickedSubjects, _clickedSubjects)&&const DeepCollectionEquality().equals(other.clashes, _clashes)&&const DeepCollectionEquality().equals(other.perPeerSummary, _perPeerSummary)&&(identical(other.verdictSummary, verdictSummary) || other.verdictSummary == verdictSummary)&&(identical(other.judgeProvider, judgeProvider) || other.judgeProvider == judgeProvider)&&(identical(other.judgeModel, judgeModel) || other.judgeModel == judgeModel)&&(identical(other.rubricVersion, rubricVersion) || other.rubricVersion == rubricVersion));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
-    return Object.hash(runtimeType,const DeepCollectionEquality().hash(_criteria),dateScore,isPartial,const DeepCollectionEquality().hash(_clickedSubjects),const DeepCollectionEquality().hash(_clashes),const DeepCollectionEquality().hash(_perPeerSummary),verdictSummary,judgeProvider,judgeModel,rubricVersion);
+    return Object.hash(runtimeType,const DeepCollectionEquality().hash(_criteria),dateScore,isPartial,confidence,evidenceNote,const DeepCollectionEquality().hash(_clickedSubjects),const DeepCollectionEquality().hash(_clashes),const DeepCollectionEquality().hash(_perPeerSummary),verdictSummary,judgeProvider,judgeModel,rubricVersion);
 }
 
 @override
 String toString() {
-    return 'Evaluation(criteria: $criteria, dateScore: $dateScore, isPartial: $isPartial, clickedSubjects: $clickedSubjects, clashes: $clashes, perPeerSummary: $perPeerSummary, verdictSummary: $verdictSummary, judgeProvider: $judgeProvider, judgeModel: $judgeModel, rubricVersion: $rubricVersion)';
+    return 'Evaluation(criteria: $criteria, dateScore: $dateScore, isPartial: $isPartial, confidence: $confidence, evidenceNote: $evidenceNote, clickedSubjects: $clickedSubjects, clashes: $clashes, perPeerSummary: $perPeerSummary, verdictSummary: $verdictSummary, judgeProvider: $judgeProvider, judgeModel: $judgeModel, rubricVersion: $rubricVersion)';
 }
 
 
@@ -297,7 +301,7 @@ abstract mixin class _$EvaluationCopyWith<$Res> implements $EvaluationCopyWith<$
   factory _$EvaluationCopyWith(_Evaluation value, $Res Function(_Evaluation) _then) = __$EvaluationCopyWithImpl;
 @override @useResult
 $Res call({
- Map<String, dynamic> criteria,@JsonKey(name: 'date_score') double dateScore,@JsonKey(name: 'is_partial') bool isPartial,@JsonKey(name: 'clicked_subjects') List<String> clickedSubjects, List<Clash> clashes,@JsonKey(name: 'per_peer_summary') Map<String, dynamic> perPeerSummary,@JsonKey(name: 'verdict_summary') String verdictSummary,@JsonKey(name: 'judge_provider') String judgeProvider,@JsonKey(name: 'judge_model') String judgeModel,@JsonKey(name: 'rubric_version') String rubricVersion
+ Map<String, dynamic> criteria,@JsonKey(name: 'date_score') double dateScore,@JsonKey(name: 'is_partial') bool isPartial, int? confidence,@JsonKey(name: 'evidence_note') String evidenceNote,@JsonKey(name: 'clicked_subjects') List<String> clickedSubjects, List<Clash> clashes,@JsonKey(name: 'per_peer_summary') Map<String, dynamic> perPeerSummary,@JsonKey(name: 'verdict_summary') String verdictSummary,@JsonKey(name: 'judge_provider') String judgeProvider,@JsonKey(name: 'judge_model') String judgeModel,@JsonKey(name: 'rubric_version') String rubricVersion
 });
 
 
@@ -314,12 +318,14 @@ class __$EvaluationCopyWithImpl<$Res>
 
 /// Create a copy of Evaluation
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? criteria = null,Object? dateScore = null,Object? isPartial = null,Object? clickedSubjects = null,Object? clashes = null,Object? perPeerSummary = null,Object? verdictSummary = null,Object? judgeProvider = null,Object? judgeModel = null,Object? rubricVersion = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? criteria = null,Object? dateScore = null,Object? isPartial = null,Object? confidence = freezed,Object? evidenceNote = null,Object? clickedSubjects = null,Object? clashes = null,Object? perPeerSummary = null,Object? verdictSummary = null,Object? judgeProvider = null,Object? judgeModel = null,Object? rubricVersion = null,}) {
   return _then(_Evaluation(
 criteria: null == criteria ? _self._criteria : criteria // ignore: cast_nullable_to_non_nullable
 as Map<String, dynamic>,dateScore: null == dateScore ? _self.dateScore : dateScore // ignore: cast_nullable_to_non_nullable
 as double,isPartial: null == isPartial ? _self.isPartial : isPartial // ignore: cast_nullable_to_non_nullable
-as bool,clickedSubjects: null == clickedSubjects ? _self._clickedSubjects : clickedSubjects // ignore: cast_nullable_to_non_nullable
+as bool,confidence: freezed == confidence ? _self.confidence : confidence // ignore: cast_nullable_to_non_nullable
+as int?,evidenceNote: null == evidenceNote ? _self.evidenceNote : evidenceNote // ignore: cast_nullable_to_non_nullable
+as String,clickedSubjects: null == clickedSubjects ? _self._clickedSubjects : clickedSubjects // ignore: cast_nullable_to_non_nullable
 as List<String>,clashes: null == clashes ? _self._clashes : clashes // ignore: cast_nullable_to_non_nullable
 as List<Clash>,perPeerSummary: null == perPeerSummary ? _self._perPeerSummary : perPeerSummary // ignore: cast_nullable_to_non_nullable
 as Map<String, dynamic>,verdictSummary: null == verdictSummary ? _self.verdictSummary : verdictSummary // ignore: cast_nullable_to_non_nullable

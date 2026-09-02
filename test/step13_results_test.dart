@@ -1,8 +1,12 @@
 /// Step 13 widget tests — every screen driven by MOCKED repositories, no
 /// server, no model calls. The fixtures are shaped like real stored data
-/// (a judged date, a partial one at half weight, an excluded one under the
-/// 10-turn rule, a transcript with an environment row), so what the tests
-/// pin is the arithmetic and the honesty rules, not a happy path.
+/// (a judged date, a partial one at half weight, one nobody spoke on, a
+/// transcript with an environment row), so what the tests pin is the
+/// arithmetic and the honesty rules, not a happy path.
+///
+/// The 10-turn exclusion those fixtures were built around was removed on
+/// 2026-09-02; `_carolDate` moved to the exclusion that still exists and
+/// `_danDate` gained a `judge_rubric.v2` confidence.
 library;
 
 import 'package:dio/dio.dart';
@@ -103,7 +107,13 @@ final _danDate = DateSummary(
     perPeerSummary: {'user': 'Alice had a good evening.', 'candidate': 'So did Dan.'},
     verdictSummary: 'They got on.',
     judgeModel: 'dots-3-note-preview',
-    rubricVersion: 'judge_rubric.v1',
+    // A v2 evaluation: judged with a confidence the judge reported itself.
+    // Five turns, and it is scored rather than thrown away -- which is the
+    // whole of the 2026-09-02 change, in one fixture.
+    confidence: 45,
+    evidenceNote: 'Warm and quick, but stops before either of them says '
+        'anything they had to think about.',
+    rubricVersion: 'judge_rubric.v2',
   ),
 );
 
@@ -152,6 +162,11 @@ final _bobDate2 = DateSummary(
   ),
 );
 
+/// The ONLY date the server still excludes from a score (2026-09-02): one
+/// where nobody spoke. It used to be a 6-turn date, excluded for being under
+/// the ten-turn threshold; that threshold is gone and a 6-turn date is now
+/// judged like any other, so the fixture had to move to the case that still
+/// exists. Three rows, all of them scenery, and not one line of conversation.
 final _carolDate = DateSummary(
   dateId: 'd-carol',
   candidateUserId: 'carol',
@@ -159,8 +174,8 @@ final _carolDate = DateSummary(
   ordinal: 1,
   status: 'incomplete',
   settingName: 'Vintage Bicycle Fair',
-  messageCount: 6,
-  turnCount: 6,
+  messageCount: 3,
+  turnCount: 0,
   error: 'AIError: provider returned 400',
   excludedFromScore: true,
 );
@@ -514,8 +529,77 @@ void main() {
       dates: _completeDates(),
     ));
     await tester.pumpAndSettle();
-    expect(find.textContaining('too short to judge'), findsOneWidget);
-    expect(find.textContaining('6 turns were spoken'), findsOneWidget);
+    // REVISED 2026-09-02. This asserted 'too short to judge' and '6 turns
+    // were spoken; a date needs 10' — the copy the owner removed the rule to
+    // stop showing. The exclusion that remains is a date with no conversation
+    // in it, and it is still stated rather than smoothed over.
+    expect(find.textContaining('nothing was said'), findsOneWidget);
+    expect(find.textContaining('too short'), findsNothing);
+  });
+
+  testWidgets('results: a thin date is JUDGED, with the judge saying how thin',
+      (tester) async {
+    // The 2026-09-02 change, seen from the screen. Dan's date is five turns.
+    // Under the old rule it would have been thrown away and Dan would have
+    // had no score at all; it is scored now, and the confidence line is what
+    // stops that score being read as if it came from a full evening.
+    await _pumpTall(tester, _app(
+      initial: '/analyses/a1/results',
+      analyses: _FakeAnalyses([_completeAnalysis]),
+      dates: _completeDates(),
+    ));
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('Something to go on · 45/100 · 5 turns spoken'),
+        findsOneWidget);
+    expect(
+      find.textContaining('stops before either of them says anything'),
+      findsOneWidget,
+    );
+    // And the score itself is untouched by it: confidence is reported beside
+    // the number, never multiplied into it. Twice, because Dan has one date --
+    // his candidate mean and that date's own score are the same number.
+    expect(find.text('94.3'), findsNWidgets(2));
+  });
+
+  testWidgets('results: a v1 evaluation shows no confidence rather than a zero',
+      (tester) async {
+    // Bob's dates predate `judge_rubric.v2` and have no confidence. Absence
+    // has to render as absence — a 0/100 here would say the judge was sure of
+    // nothing about a reading it was never asked to qualify.
+    await _pumpTall(tester, _app(
+      initial: '/analyses/a1/results',
+      analyses: _FakeAnalyses([_completeAnalysis]),
+      dates: _completeDates(),
+    ));
+    await tester.pumpAndSettle();
+    expect(find.textContaining('0/100'), findsNothing);
+    expect(find.textContaining('/100'), findsOneWidget); // Dan's, and only his
+  });
+
+  testWidgets('results: a date left unscored by the removed rule says so, and '
+      'is not described as scored', (tester) async {
+    // The migration case, and the one that could quietly lie. Dates excluded
+    // under the old ten-turn rule were never judged; removing the rule made
+    // them judgeable without retroactively judging them, so they arrive as
+    // "finished, not excluded, no evaluation". The old `incomplete` branch
+    // would have printed "Scored from a partial date — weighted half" over a
+    // date with no score at all.
+    await _pumpTall(tester, _app(
+      initial: '/analyses/a1/results',
+      analyses: _FakeAnalyses([_completeAnalysis]),
+      dates: _FakeDates(
+        payload: DatesPayload(
+          analysisId: 'a1',
+          status: 'complete',
+          dates: [_danDate, _bobDate2.copyWith(evaluation: null)],
+        ),
+        transcripts: {'d-dan': _transcript},
+      ),
+    ));
+    await tester.pumpAndSettle();
+    expect(find.textContaining('has no score'), findsOneWidget);
+    expect(find.textContaining('Scored from a partial date'), findsNothing);
   });
 
   testWidgets('results: the shared fixture is stated, and only when there is one',

@@ -10,6 +10,8 @@ _Evaluation _$EvaluationFromJson(Map<String, dynamic> json) => _Evaluation(
   criteria: json['criteria'] as Map<String, dynamic>,
   dateScore: (json['date_score'] as num).toDouble(),
   isPartial: json['is_partial'] as bool,
+  confidence: (json['confidence'] as num?)?.toInt(),
+  evidenceNote: json['evidence_note'] as String? ?? '',
   clickedSubjects:
       (json['clicked_subjects'] as List<dynamic>?)
           ?.map((e) => e as String)
@@ -34,6 +36,8 @@ Map<String, dynamic> _$EvaluationToJson(_Evaluation instance) =>
       'criteria': instance.criteria,
       'date_score': instance.dateScore,
       'is_partial': instance.isPartial,
+      'confidence': instance.confidence,
+      'evidence_note': instance.evidenceNote,
       'clicked_subjects': instance.clickedSubjects,
       'clashes': instance.clashes,
       'per_peer_summary': instance.perPeerSummary,
