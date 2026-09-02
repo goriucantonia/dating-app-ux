@@ -98,8 +98,17 @@ class _Body extends StatelessWidget {
     final partial = payload.dates
         .where((d) => d.evaluation?.isPartial == true || d.status == 'incomplete')
         .length;
-    // "The same two settings for every candidate" is the claim the design
-    // makes in its masthead — so it is printed from the data, in order.
+    // The evening every candidate was run against, read off the wire rather
+    // than inferred by comparing three `settingName` strings (2026-09-02).
+    //
+    // This block used to gather the distinct settings and, if there was more
+    // than one, print "— the same for every candidate" under them. Under the
+    // old per-candidate design that sentence was FALSE and the screen said it
+    // anyway: three candidates had three different evenings and the masthead
+    // claimed they had shared them. It is true now, and it is printed from
+    // `payload.fixture`, which is the server stating it rather than the client
+    // deducing it.
+    final fixture = payload.fixture;
     final settings = <String>{
       for (final d in payload.dates)
         if (d.settingName.isNotEmpty) d.settingName,
@@ -152,7 +161,25 @@ class _Body extends StatelessWidget {
                     Kicker('Analysis · ${a.status}', size: 12),
                     const SizedBox(height: 6),
                     Text('Ranking', style: theme.textTheme.headlineMedium),
-                    if (settings.isNotEmpty) ...[
+                    if (fixture != null) ...[
+                      const SizedBox(height: 10),
+                      Wrap(
+                        spacing: 10,
+                        runSpacing: 6,
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        children: [
+                          const Tag('The same evening', filled: true),
+                          Text(fixture.settingName,
+                              style: theme.textTheme.titleSmall),
+                          Text('— every candidate went here, so these scores '
+                              'compare',
+                              style: theme.textTheme.bodySmall),
+                        ],
+                      ),
+                    ] else if (settings.isNotEmpty) ...[
+                      // An analysis from before the shared fixture: each date
+                      // had its own setting, and the screen says exactly that
+                      // rather than implying a comparison that was not made.
                       const SizedBox(height: 10),
                       Wrap(
                         spacing: 10,
@@ -163,7 +190,7 @@ class _Body extends StatelessWidget {
                           for (final s in settings)
                             Text(s, style: theme.textTheme.titleSmall),
                           if (settings.length > 1)
-                            Text('— the same for every candidate',
+                            Text('— a different one per candidate',
                                 style: theme.textTheme.bodySmall),
                         ],
                       ),

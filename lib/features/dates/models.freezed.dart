@@ -613,7 +613,7 @@ as String,
 /// @nodoc
 mixin _$DateSummary {
 
-@JsonKey(name: 'date_id') String get dateId;@JsonKey(name: 'candidate_user_id') String get candidateUserId;@JsonKey(name: 'candidate_name') String get candidateName; int get ordinal; String get status;@JsonKey(name: 'setting_name') String get settingName; String get description;@JsonKey(name: 'sensory_details') String get sensoryDetails;@JsonKey(name: 'anchored_in_interest') String get anchoredInInterest;@JsonKey(name: 'message_count') int get messageCount;@JsonKey(name: 'turn_count') int get turnCount; String? get error;@JsonKey(name: 'ended_by') String? get endedBy; Evaluation? get evaluation;@JsonKey(name: 'excluded_from_score') bool get excludedFromScore;
+@JsonKey(name: 'date_id') String get dateId;@JsonKey(name: 'candidate_user_id') String get candidateUserId;@JsonKey(name: 'candidate_name') String get candidateName; int get ordinal; String get status;@JsonKey(name: 'setting_name') String get settingName; String get description;@JsonKey(name: 'sensory_details') String get sensoryDetails; String get archetype;@JsonKey(name: 'message_count') int get messageCount;@JsonKey(name: 'turn_count') int get turnCount; String? get error;@JsonKey(name: 'ended_by') String? get endedBy; Evaluation? get evaluation;@JsonKey(name: 'excluded_from_score') bool get excludedFromScore;
 /// Create a copy of DateSummary
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -627,20 +627,20 @@ $DateSummaryCopyWith<DateSummary> get copyWith => _$DateSummaryCopyWithImpl<Date
 @override
 bool operator ==(Object other) {
   final _this = this as DateSummary;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is DateSummary&&(identical(other.dateId, _this.dateId) || other.dateId == _this.dateId)&&(identical(other.candidateUserId, _this.candidateUserId) || other.candidateUserId == _this.candidateUserId)&&(identical(other.candidateName, _this.candidateName) || other.candidateName == _this.candidateName)&&(identical(other.ordinal, _this.ordinal) || other.ordinal == _this.ordinal)&&(identical(other.status, _this.status) || other.status == _this.status)&&(identical(other.settingName, _this.settingName) || other.settingName == _this.settingName)&&(identical(other.description, _this.description) || other.description == _this.description)&&(identical(other.sensoryDetails, _this.sensoryDetails) || other.sensoryDetails == _this.sensoryDetails)&&(identical(other.anchoredInInterest, _this.anchoredInInterest) || other.anchoredInInterest == _this.anchoredInInterest)&&(identical(other.messageCount, _this.messageCount) || other.messageCount == _this.messageCount)&&(identical(other.turnCount, _this.turnCount) || other.turnCount == _this.turnCount)&&(identical(other.error, _this.error) || other.error == _this.error)&&(identical(other.endedBy, _this.endedBy) || other.endedBy == _this.endedBy)&&(identical(other.evaluation, _this.evaluation) || other.evaluation == _this.evaluation)&&(identical(other.excludedFromScore, _this.excludedFromScore) || other.excludedFromScore == _this.excludedFromScore));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is DateSummary&&(identical(other.dateId, _this.dateId) || other.dateId == _this.dateId)&&(identical(other.candidateUserId, _this.candidateUserId) || other.candidateUserId == _this.candidateUserId)&&(identical(other.candidateName, _this.candidateName) || other.candidateName == _this.candidateName)&&(identical(other.ordinal, _this.ordinal) || other.ordinal == _this.ordinal)&&(identical(other.status, _this.status) || other.status == _this.status)&&(identical(other.settingName, _this.settingName) || other.settingName == _this.settingName)&&(identical(other.description, _this.description) || other.description == _this.description)&&(identical(other.sensoryDetails, _this.sensoryDetails) || other.sensoryDetails == _this.sensoryDetails)&&(identical(other.archetype, _this.archetype) || other.archetype == _this.archetype)&&(identical(other.messageCount, _this.messageCount) || other.messageCount == _this.messageCount)&&(identical(other.turnCount, _this.turnCount) || other.turnCount == _this.turnCount)&&(identical(other.error, _this.error) || other.error == _this.error)&&(identical(other.endedBy, _this.endedBy) || other.endedBy == _this.endedBy)&&(identical(other.evaluation, _this.evaluation) || other.evaluation == _this.evaluation)&&(identical(other.excludedFromScore, _this.excludedFromScore) || other.excludedFromScore == _this.excludedFromScore));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
   final _this = this as DateSummary;
-  return Object.hash(runtimeType,_this.dateId,_this.candidateUserId,_this.candidateName,_this.ordinal,_this.status,_this.settingName,_this.description,_this.sensoryDetails,_this.anchoredInInterest,_this.messageCount,_this.turnCount,_this.error,_this.endedBy,_this.evaluation,_this.excludedFromScore);
+  return Object.hash(runtimeType,_this.dateId,_this.candidateUserId,_this.candidateName,_this.ordinal,_this.status,_this.settingName,_this.description,_this.sensoryDetails,_this.archetype,_this.messageCount,_this.turnCount,_this.error,_this.endedBy,_this.evaluation,_this.excludedFromScore);
 }
 
 @override
 String toString() {
   final _this = this as DateSummary;
-  return 'DateSummary(dateId: ${_this.dateId}, candidateUserId: ${_this.candidateUserId}, candidateName: ${_this.candidateName}, ordinal: ${_this.ordinal}, status: ${_this.status}, settingName: ${_this.settingName}, description: ${_this.description}, sensoryDetails: ${_this.sensoryDetails}, anchoredInInterest: ${_this.anchoredInInterest}, messageCount: ${_this.messageCount}, turnCount: ${_this.turnCount}, error: ${_this.error}, endedBy: ${_this.endedBy}, evaluation: ${_this.evaluation}, excludedFromScore: ${_this.excludedFromScore})';
+  return 'DateSummary(dateId: ${_this.dateId}, candidateUserId: ${_this.candidateUserId}, candidateName: ${_this.candidateName}, ordinal: ${_this.ordinal}, status: ${_this.status}, settingName: ${_this.settingName}, description: ${_this.description}, sensoryDetails: ${_this.sensoryDetails}, archetype: ${_this.archetype}, messageCount: ${_this.messageCount}, turnCount: ${_this.turnCount}, error: ${_this.error}, endedBy: ${_this.endedBy}, evaluation: ${_this.evaluation}, excludedFromScore: ${_this.excludedFromScore})';
 }
 
 
@@ -651,7 +651,7 @@ abstract mixin class $DateSummaryCopyWith<$Res>  {
   factory $DateSummaryCopyWith(DateSummary value, $Res Function(DateSummary) _then) = _$DateSummaryCopyWithImpl;
 @useResult
 $Res call({
-@JsonKey(name: 'date_id') String dateId,@JsonKey(name: 'candidate_user_id') String candidateUserId,@JsonKey(name: 'candidate_name') String candidateName, int ordinal, String status,@JsonKey(name: 'setting_name') String settingName, String description,@JsonKey(name: 'sensory_details') String sensoryDetails,@JsonKey(name: 'anchored_in_interest') String anchoredInInterest,@JsonKey(name: 'message_count') int messageCount,@JsonKey(name: 'turn_count') int turnCount, String? error,@JsonKey(name: 'ended_by') String? endedBy, Evaluation? evaluation,@JsonKey(name: 'excluded_from_score') bool excludedFromScore
+@JsonKey(name: 'date_id') String dateId,@JsonKey(name: 'candidate_user_id') String candidateUserId,@JsonKey(name: 'candidate_name') String candidateName, int ordinal, String status,@JsonKey(name: 'setting_name') String settingName, String description,@JsonKey(name: 'sensory_details') String sensoryDetails, String archetype,@JsonKey(name: 'message_count') int messageCount,@JsonKey(name: 'turn_count') int turnCount, String? error,@JsonKey(name: 'ended_by') String? endedBy, Evaluation? evaluation,@JsonKey(name: 'excluded_from_score') bool excludedFromScore
 });
 
 
@@ -668,7 +668,7 @@ class _$DateSummaryCopyWithImpl<$Res>
 
 /// Create a copy of DateSummary
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? dateId = null,Object? candidateUserId = null,Object? candidateName = null,Object? ordinal = null,Object? status = null,Object? settingName = null,Object? description = null,Object? sensoryDetails = null,Object? anchoredInInterest = null,Object? messageCount = null,Object? turnCount = null,Object? error = freezed,Object? endedBy = freezed,Object? evaluation = freezed,Object? excludedFromScore = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? dateId = null,Object? candidateUserId = null,Object? candidateName = null,Object? ordinal = null,Object? status = null,Object? settingName = null,Object? description = null,Object? sensoryDetails = null,Object? archetype = null,Object? messageCount = null,Object? turnCount = null,Object? error = freezed,Object? endedBy = freezed,Object? evaluation = freezed,Object? excludedFromScore = null,}) {
   return _then(DateSummary(
 dateId: null == dateId ? _self.dateId : dateId // ignore: cast_nullable_to_non_nullable
 as String,candidateUserId: null == candidateUserId ? _self.candidateUserId : candidateUserId // ignore: cast_nullable_to_non_nullable
@@ -678,7 +678,7 @@ as int,status: null == status ? _self.status : status // ignore: cast_nullable_t
 as String,settingName: null == settingName ? _self.settingName : settingName // ignore: cast_nullable_to_non_nullable
 as String,description: null == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
 as String,sensoryDetails: null == sensoryDetails ? _self.sensoryDetails : sensoryDetails // ignore: cast_nullable_to_non_nullable
-as String,anchoredInInterest: null == anchoredInInterest ? _self.anchoredInInterest : anchoredInInterest // ignore: cast_nullable_to_non_nullable
+as String,archetype: null == archetype ? _self.archetype : archetype // ignore: cast_nullable_to_non_nullable
 as String,messageCount: null == messageCount ? _self.messageCount : messageCount // ignore: cast_nullable_to_non_nullable
 as int,turnCount: null == turnCount ? _self.turnCount : turnCount // ignore: cast_nullable_to_non_nullable
 as int,error: freezed == error ? _self.error : error // ignore: cast_nullable_to_non_nullable
@@ -782,10 +782,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(name: 'date_id')  String dateId, @JsonKey(name: 'candidate_user_id')  String candidateUserId, @JsonKey(name: 'candidate_name')  String candidateName,  int ordinal,  String status, @JsonKey(name: 'setting_name')  String settingName,  String description, @JsonKey(name: 'sensory_details')  String sensoryDetails, @JsonKey(name: 'anchored_in_interest')  String anchoredInInterest, @JsonKey(name: 'message_count')  int messageCount, @JsonKey(name: 'turn_count')  int turnCount,  String? error, @JsonKey(name: 'ended_by')  String? endedBy,  Evaluation? evaluation, @JsonKey(name: 'excluded_from_score')  bool excludedFromScore)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(name: 'date_id')  String dateId, @JsonKey(name: 'candidate_user_id')  String candidateUserId, @JsonKey(name: 'candidate_name')  String candidateName,  int ordinal,  String status, @JsonKey(name: 'setting_name')  String settingName,  String description, @JsonKey(name: 'sensory_details')  String sensoryDetails,  String archetype, @JsonKey(name: 'message_count')  int messageCount, @JsonKey(name: 'turn_count')  int turnCount,  String? error, @JsonKey(name: 'ended_by')  String? endedBy,  Evaluation? evaluation, @JsonKey(name: 'excluded_from_score')  bool excludedFromScore)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _DateSummary() when $default != null:
-return $default(_that.dateId,_that.candidateUserId,_that.candidateName,_that.ordinal,_that.status,_that.settingName,_that.description,_that.sensoryDetails,_that.anchoredInInterest,_that.messageCount,_that.turnCount,_that.error,_that.endedBy,_that.evaluation,_that.excludedFromScore);case _:
+return $default(_that.dateId,_that.candidateUserId,_that.candidateName,_that.ordinal,_that.status,_that.settingName,_that.description,_that.sensoryDetails,_that.archetype,_that.messageCount,_that.turnCount,_that.error,_that.endedBy,_that.evaluation,_that.excludedFromScore);case _:
   return orElse();
 
 }
@@ -803,10 +803,10 @@ return $default(_that.dateId,_that.candidateUserId,_that.candidateName,_that.ord
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(name: 'date_id')  String dateId, @JsonKey(name: 'candidate_user_id')  String candidateUserId, @JsonKey(name: 'candidate_name')  String candidateName,  int ordinal,  String status, @JsonKey(name: 'setting_name')  String settingName,  String description, @JsonKey(name: 'sensory_details')  String sensoryDetails, @JsonKey(name: 'anchored_in_interest')  String anchoredInInterest, @JsonKey(name: 'message_count')  int messageCount, @JsonKey(name: 'turn_count')  int turnCount,  String? error, @JsonKey(name: 'ended_by')  String? endedBy,  Evaluation? evaluation, @JsonKey(name: 'excluded_from_score')  bool excludedFromScore)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(name: 'date_id')  String dateId, @JsonKey(name: 'candidate_user_id')  String candidateUserId, @JsonKey(name: 'candidate_name')  String candidateName,  int ordinal,  String status, @JsonKey(name: 'setting_name')  String settingName,  String description, @JsonKey(name: 'sensory_details')  String sensoryDetails,  String archetype, @JsonKey(name: 'message_count')  int messageCount, @JsonKey(name: 'turn_count')  int turnCount,  String? error, @JsonKey(name: 'ended_by')  String? endedBy,  Evaluation? evaluation, @JsonKey(name: 'excluded_from_score')  bool excludedFromScore)  $default,) {final _that = this;
 switch (_that) {
 case _DateSummary():
-return $default(_that.dateId,_that.candidateUserId,_that.candidateName,_that.ordinal,_that.status,_that.settingName,_that.description,_that.sensoryDetails,_that.anchoredInInterest,_that.messageCount,_that.turnCount,_that.error,_that.endedBy,_that.evaluation,_that.excludedFromScore);case _:
+return $default(_that.dateId,_that.candidateUserId,_that.candidateName,_that.ordinal,_that.status,_that.settingName,_that.description,_that.sensoryDetails,_that.archetype,_that.messageCount,_that.turnCount,_that.error,_that.endedBy,_that.evaluation,_that.excludedFromScore);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -823,10 +823,10 @@ return $default(_that.dateId,_that.candidateUserId,_that.candidateName,_that.ord
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(name: 'date_id')  String dateId, @JsonKey(name: 'candidate_user_id')  String candidateUserId, @JsonKey(name: 'candidate_name')  String candidateName,  int ordinal,  String status, @JsonKey(name: 'setting_name')  String settingName,  String description, @JsonKey(name: 'sensory_details')  String sensoryDetails, @JsonKey(name: 'anchored_in_interest')  String anchoredInInterest, @JsonKey(name: 'message_count')  int messageCount, @JsonKey(name: 'turn_count')  int turnCount,  String? error, @JsonKey(name: 'ended_by')  String? endedBy,  Evaluation? evaluation, @JsonKey(name: 'excluded_from_score')  bool excludedFromScore)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(name: 'date_id')  String dateId, @JsonKey(name: 'candidate_user_id')  String candidateUserId, @JsonKey(name: 'candidate_name')  String candidateName,  int ordinal,  String status, @JsonKey(name: 'setting_name')  String settingName,  String description, @JsonKey(name: 'sensory_details')  String sensoryDetails,  String archetype, @JsonKey(name: 'message_count')  int messageCount, @JsonKey(name: 'turn_count')  int turnCount,  String? error, @JsonKey(name: 'ended_by')  String? endedBy,  Evaluation? evaluation, @JsonKey(name: 'excluded_from_score')  bool excludedFromScore)?  $default,) {final _that = this;
 switch (_that) {
 case _DateSummary() when $default != null:
-return $default(_that.dateId,_that.candidateUserId,_that.candidateName,_that.ordinal,_that.status,_that.settingName,_that.description,_that.sensoryDetails,_that.anchoredInInterest,_that.messageCount,_that.turnCount,_that.error,_that.endedBy,_that.evaluation,_that.excludedFromScore);case _:
+return $default(_that.dateId,_that.candidateUserId,_that.candidateName,_that.ordinal,_that.status,_that.settingName,_that.description,_that.sensoryDetails,_that.archetype,_that.messageCount,_that.turnCount,_that.error,_that.endedBy,_that.evaluation,_that.excludedFromScore);case _:
   return null;
 
 }
@@ -838,7 +838,7 @@ return $default(_that.dateId,_that.candidateUserId,_that.candidateName,_that.ord
 @JsonSerializable()
 
 class _DateSummary implements DateSummary {
-  const _DateSummary({@JsonKey(name: 'date_id') required this.dateId, @JsonKey(name: 'candidate_user_id') required this.candidateUserId, @JsonKey(name: 'candidate_name') required this.candidateName, required this.ordinal, required this.status, @JsonKey(name: 'setting_name') this.settingName = '', this.description = '', @JsonKey(name: 'sensory_details') this.sensoryDetails = '', @JsonKey(name: 'anchored_in_interest') this.anchoredInInterest = '', @JsonKey(name: 'message_count') this.messageCount = 0, @JsonKey(name: 'turn_count') this.turnCount = 0, this.error, @JsonKey(name: 'ended_by') this.endedBy, this.evaluation, @JsonKey(name: 'excluded_from_score') this.excludedFromScore = false});
+  const _DateSummary({@JsonKey(name: 'date_id') required this.dateId, @JsonKey(name: 'candidate_user_id') required this.candidateUserId, @JsonKey(name: 'candidate_name') required this.candidateName, required this.ordinal, required this.status, @JsonKey(name: 'setting_name') this.settingName = '', this.description = '', @JsonKey(name: 'sensory_details') this.sensoryDetails = '', this.archetype = '', @JsonKey(name: 'message_count') this.messageCount = 0, @JsonKey(name: 'turn_count') this.turnCount = 0, this.error, @JsonKey(name: 'ended_by') this.endedBy, this.evaluation, @JsonKey(name: 'excluded_from_score') this.excludedFromScore = false});
   factory _DateSummary.fromJson(Map<String, dynamic> json) => _$DateSummaryFromJson(json);
 
 @override@JsonKey(name: 'date_id') final  String dateId;
@@ -849,7 +849,7 @@ class _DateSummary implements DateSummary {
 @override@JsonKey(name: 'setting_name') final  String settingName;
 @override@JsonKey() final  String description;
 @override@JsonKey(name: 'sensory_details') final  String sensoryDetails;
-@override@JsonKey(name: 'anchored_in_interest') final  String anchoredInInterest;
+@override@JsonKey() final  String archetype;
 @override@JsonKey(name: 'message_count') final  int messageCount;
 @override@JsonKey(name: 'turn_count') final  int turnCount;
 @override final  String? error;
@@ -870,18 +870,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _DateSummary&&(identical(other.dateId, dateId) || other.dateId == dateId)&&(identical(other.candidateUserId, candidateUserId) || other.candidateUserId == candidateUserId)&&(identical(other.candidateName, candidateName) || other.candidateName == candidateName)&&(identical(other.ordinal, ordinal) || other.ordinal == ordinal)&&(identical(other.status, status) || other.status == status)&&(identical(other.settingName, settingName) || other.settingName == settingName)&&(identical(other.description, description) || other.description == description)&&(identical(other.sensoryDetails, sensoryDetails) || other.sensoryDetails == sensoryDetails)&&(identical(other.anchoredInInterest, anchoredInInterest) || other.anchoredInInterest == anchoredInInterest)&&(identical(other.messageCount, messageCount) || other.messageCount == messageCount)&&(identical(other.turnCount, turnCount) || other.turnCount == turnCount)&&(identical(other.error, error) || other.error == error)&&(identical(other.endedBy, endedBy) || other.endedBy == endedBy)&&(identical(other.evaluation, evaluation) || other.evaluation == evaluation)&&(identical(other.excludedFromScore, excludedFromScore) || other.excludedFromScore == excludedFromScore));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _DateSummary&&(identical(other.dateId, dateId) || other.dateId == dateId)&&(identical(other.candidateUserId, candidateUserId) || other.candidateUserId == candidateUserId)&&(identical(other.candidateName, candidateName) || other.candidateName == candidateName)&&(identical(other.ordinal, ordinal) || other.ordinal == ordinal)&&(identical(other.status, status) || other.status == status)&&(identical(other.settingName, settingName) || other.settingName == settingName)&&(identical(other.description, description) || other.description == description)&&(identical(other.sensoryDetails, sensoryDetails) || other.sensoryDetails == sensoryDetails)&&(identical(other.archetype, archetype) || other.archetype == archetype)&&(identical(other.messageCount, messageCount) || other.messageCount == messageCount)&&(identical(other.turnCount, turnCount) || other.turnCount == turnCount)&&(identical(other.error, error) || other.error == error)&&(identical(other.endedBy, endedBy) || other.endedBy == endedBy)&&(identical(other.evaluation, evaluation) || other.evaluation == evaluation)&&(identical(other.excludedFromScore, excludedFromScore) || other.excludedFromScore == excludedFromScore));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
-    return Object.hash(runtimeType,dateId,candidateUserId,candidateName,ordinal,status,settingName,description,sensoryDetails,anchoredInInterest,messageCount,turnCount,error,endedBy,evaluation,excludedFromScore);
+    return Object.hash(runtimeType,dateId,candidateUserId,candidateName,ordinal,status,settingName,description,sensoryDetails,archetype,messageCount,turnCount,error,endedBy,evaluation,excludedFromScore);
 }
 
 @override
 String toString() {
-    return 'DateSummary(dateId: $dateId, candidateUserId: $candidateUserId, candidateName: $candidateName, ordinal: $ordinal, status: $status, settingName: $settingName, description: $description, sensoryDetails: $sensoryDetails, anchoredInInterest: $anchoredInInterest, messageCount: $messageCount, turnCount: $turnCount, error: $error, endedBy: $endedBy, evaluation: $evaluation, excludedFromScore: $excludedFromScore)';
+    return 'DateSummary(dateId: $dateId, candidateUserId: $candidateUserId, candidateName: $candidateName, ordinal: $ordinal, status: $status, settingName: $settingName, description: $description, sensoryDetails: $sensoryDetails, archetype: $archetype, messageCount: $messageCount, turnCount: $turnCount, error: $error, endedBy: $endedBy, evaluation: $evaluation, excludedFromScore: $excludedFromScore)';
 }
 
 
@@ -892,7 +892,7 @@ abstract mixin class _$DateSummaryCopyWith<$Res> implements $DateSummaryCopyWith
   factory _$DateSummaryCopyWith(_DateSummary value, $Res Function(_DateSummary) _then) = __$DateSummaryCopyWithImpl;
 @override @useResult
 $Res call({
-@JsonKey(name: 'date_id') String dateId,@JsonKey(name: 'candidate_user_id') String candidateUserId,@JsonKey(name: 'candidate_name') String candidateName, int ordinal, String status,@JsonKey(name: 'setting_name') String settingName, String description,@JsonKey(name: 'sensory_details') String sensoryDetails,@JsonKey(name: 'anchored_in_interest') String anchoredInInterest,@JsonKey(name: 'message_count') int messageCount,@JsonKey(name: 'turn_count') int turnCount, String? error,@JsonKey(name: 'ended_by') String? endedBy, Evaluation? evaluation,@JsonKey(name: 'excluded_from_score') bool excludedFromScore
+@JsonKey(name: 'date_id') String dateId,@JsonKey(name: 'candidate_user_id') String candidateUserId,@JsonKey(name: 'candidate_name') String candidateName, int ordinal, String status,@JsonKey(name: 'setting_name') String settingName, String description,@JsonKey(name: 'sensory_details') String sensoryDetails, String archetype,@JsonKey(name: 'message_count') int messageCount,@JsonKey(name: 'turn_count') int turnCount, String? error,@JsonKey(name: 'ended_by') String? endedBy, Evaluation? evaluation,@JsonKey(name: 'excluded_from_score') bool excludedFromScore
 });
 
 
@@ -909,7 +909,7 @@ class __$DateSummaryCopyWithImpl<$Res>
 
 /// Create a copy of DateSummary
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? dateId = null,Object? candidateUserId = null,Object? candidateName = null,Object? ordinal = null,Object? status = null,Object? settingName = null,Object? description = null,Object? sensoryDetails = null,Object? anchoredInInterest = null,Object? messageCount = null,Object? turnCount = null,Object? error = freezed,Object? endedBy = freezed,Object? evaluation = freezed,Object? excludedFromScore = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? dateId = null,Object? candidateUserId = null,Object? candidateName = null,Object? ordinal = null,Object? status = null,Object? settingName = null,Object? description = null,Object? sensoryDetails = null,Object? archetype = null,Object? messageCount = null,Object? turnCount = null,Object? error = freezed,Object? endedBy = freezed,Object? evaluation = freezed,Object? excludedFromScore = null,}) {
   return _then(_DateSummary(
 dateId: null == dateId ? _self.dateId : dateId // ignore: cast_nullable_to_non_nullable
 as String,candidateUserId: null == candidateUserId ? _self.candidateUserId : candidateUserId // ignore: cast_nullable_to_non_nullable
@@ -919,7 +919,7 @@ as int,status: null == status ? _self.status : status // ignore: cast_nullable_t
 as String,settingName: null == settingName ? _self.settingName : settingName // ignore: cast_nullable_to_non_nullable
 as String,description: null == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
 as String,sensoryDetails: null == sensoryDetails ? _self.sensoryDetails : sensoryDetails // ignore: cast_nullable_to_non_nullable
-as String,anchoredInInterest: null == anchoredInInterest ? _self.anchoredInInterest : anchoredInInterest // ignore: cast_nullable_to_non_nullable
+as String,archetype: null == archetype ? _self.archetype : archetype // ignore: cast_nullable_to_non_nullable
 as String,messageCount: null == messageCount ? _self.messageCount : messageCount // ignore: cast_nullable_to_non_nullable
 as int,turnCount: null == turnCount ? _self.turnCount : turnCount // ignore: cast_nullable_to_non_nullable
 as int,error: freezed == error ? _self.error : error // ignore: cast_nullable_to_non_nullable
@@ -947,9 +947,285 @@ $EvaluationCopyWith<$Res>? get evaluation {
 
 
 /// @nodoc
+mixin _$Fixture {
+
+@JsonKey(name: 'setting_name') String get settingName; String get archetype;@JsonKey(name: 'dates_per_candidate') int get datesPerCandidate;
+/// Create a copy of Fixture
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$FixtureCopyWith<Fixture> get copyWith => _$FixtureCopyWithImpl<Fixture>(this as Fixture, _$identity);
+
+  /// Serializes this Fixture to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  final _this = this as Fixture;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Fixture&&(identical(other.settingName, _this.settingName) || other.settingName == _this.settingName)&&(identical(other.archetype, _this.archetype) || other.archetype == _this.archetype)&&(identical(other.datesPerCandidate, _this.datesPerCandidate) || other.datesPerCandidate == _this.datesPerCandidate));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode {
+  final _this = this as Fixture;
+  return Object.hash(runtimeType,_this.settingName,_this.archetype,_this.datesPerCandidate);
+}
+
+@override
+String toString() {
+  final _this = this as Fixture;
+  return 'Fixture(settingName: ${_this.settingName}, archetype: ${_this.archetype}, datesPerCandidate: ${_this.datesPerCandidate})';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $FixtureCopyWith<$Res>  {
+  factory $FixtureCopyWith(Fixture value, $Res Function(Fixture) _then) = _$FixtureCopyWithImpl;
+@useResult
+$Res call({
+@JsonKey(name: 'setting_name') String settingName, String archetype,@JsonKey(name: 'dates_per_candidate') int datesPerCandidate
+});
+
+
+
+
+}
+/// @nodoc
+class _$FixtureCopyWithImpl<$Res>
+    implements $FixtureCopyWith<$Res> {
+  _$FixtureCopyWithImpl(this._self, this._then);
+
+  final Fixture _self;
+  final $Res Function(Fixture) _then;
+
+/// Create a copy of Fixture
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? settingName = null,Object? archetype = null,Object? datesPerCandidate = null,}) {
+  return _then(Fixture(
+settingName: null == settingName ? _self.settingName : settingName // ignore: cast_nullable_to_non_nullable
+as String,archetype: null == archetype ? _self.archetype : archetype // ignore: cast_nullable_to_non_nullable
+as String,datesPerCandidate: null == datesPerCandidate ? _self.datesPerCandidate : datesPerCandidate // ignore: cast_nullable_to_non_nullable
+as int,
+  ));
+}
+
+}
+
+
+/// Adds pattern-matching-related methods to [Fixture].
+extension FixturePatterns on Fixture {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _Fixture value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _Fixture() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _Fixture value)  $default,){
+final _that = this;
+switch (_that) {
+case _Fixture():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _Fixture value)?  $default,){
+final _that = this;
+switch (_that) {
+case _Fixture() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(name: 'setting_name')  String settingName,  String archetype, @JsonKey(name: 'dates_per_candidate')  int datesPerCandidate)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _Fixture() when $default != null:
+return $default(_that.settingName,_that.archetype,_that.datesPerCandidate);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(name: 'setting_name')  String settingName,  String archetype, @JsonKey(name: 'dates_per_candidate')  int datesPerCandidate)  $default,) {final _that = this;
+switch (_that) {
+case _Fixture():
+return $default(_that.settingName,_that.archetype,_that.datesPerCandidate);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(name: 'setting_name')  String settingName,  String archetype, @JsonKey(name: 'dates_per_candidate')  int datesPerCandidate)?  $default,) {final _that = this;
+switch (_that) {
+case _Fixture() when $default != null:
+return $default(_that.settingName,_that.archetype,_that.datesPerCandidate);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class _Fixture implements Fixture {
+  const _Fixture({@JsonKey(name: 'setting_name') this.settingName = '', this.archetype = '', @JsonKey(name: 'dates_per_candidate') this.datesPerCandidate = 1});
+  factory _Fixture.fromJson(Map<String, dynamic> json) => _$FixtureFromJson(json);
+
+@override@JsonKey(name: 'setting_name') final  String settingName;
+@override@JsonKey() final  String archetype;
+@override@JsonKey(name: 'dates_per_candidate') final  int datesPerCandidate;
+
+/// Create a copy of Fixture
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$FixtureCopyWith<_Fixture> get copyWith => __$FixtureCopyWithImpl<_Fixture>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$FixtureToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _Fixture&&(identical(other.settingName, settingName) || other.settingName == settingName)&&(identical(other.archetype, archetype) || other.archetype == archetype)&&(identical(other.datesPerCandidate, datesPerCandidate) || other.datesPerCandidate == datesPerCandidate));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode {
+    return Object.hash(runtimeType,settingName,archetype,datesPerCandidate);
+}
+
+@override
+String toString() {
+    return 'Fixture(settingName: $settingName, archetype: $archetype, datesPerCandidate: $datesPerCandidate)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$FixtureCopyWith<$Res> implements $FixtureCopyWith<$Res> {
+  factory _$FixtureCopyWith(_Fixture value, $Res Function(_Fixture) _then) = __$FixtureCopyWithImpl;
+@override @useResult
+$Res call({
+@JsonKey(name: 'setting_name') String settingName, String archetype,@JsonKey(name: 'dates_per_candidate') int datesPerCandidate
+});
+
+
+
+
+}
+/// @nodoc
+class __$FixtureCopyWithImpl<$Res>
+    implements _$FixtureCopyWith<$Res> {
+  __$FixtureCopyWithImpl(this._self, this._then);
+
+  final _Fixture _self;
+  final $Res Function(_Fixture) _then;
+
+/// Create a copy of Fixture
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? settingName = null,Object? archetype = null,Object? datesPerCandidate = null,}) {
+  return _then(_Fixture(
+settingName: null == settingName ? _self.settingName : settingName // ignore: cast_nullable_to_non_nullable
+as String,archetype: null == archetype ? _self.archetype : archetype // ignore: cast_nullable_to_non_nullable
+as String,datesPerCandidate: null == datesPerCandidate ? _self.datesPerCandidate : datesPerCandidate // ignore: cast_nullable_to_non_nullable
+as int,
+  ));
+}
+
+
+}
+
+
+/// @nodoc
 mixin _$DatesPayload {
 
-@JsonKey(name: 'analysis_id') String get analysisId; String get status; Map<String, dynamic>? get progress; List<DateSummary> get dates;
+@JsonKey(name: 'analysis_id') String get analysisId; String get status; Map<String, dynamic>? get progress; Fixture? get fixture; List<DateSummary> get dates;
 /// Create a copy of DatesPayload
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -963,20 +1239,20 @@ $DatesPayloadCopyWith<DatesPayload> get copyWith => _$DatesPayloadCopyWithImpl<D
 @override
 bool operator ==(Object other) {
   final _this = this as DatesPayload;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is DatesPayload&&(identical(other.analysisId, _this.analysisId) || other.analysisId == _this.analysisId)&&(identical(other.status, _this.status) || other.status == _this.status)&&const DeepCollectionEquality().equals(other.progress, _this.progress)&&const DeepCollectionEquality().equals(other.dates, _this.dates));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is DatesPayload&&(identical(other.analysisId, _this.analysisId) || other.analysisId == _this.analysisId)&&(identical(other.status, _this.status) || other.status == _this.status)&&const DeepCollectionEquality().equals(other.progress, _this.progress)&&(identical(other.fixture, _this.fixture) || other.fixture == _this.fixture)&&const DeepCollectionEquality().equals(other.dates, _this.dates));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
   final _this = this as DatesPayload;
-  return Object.hash(runtimeType,_this.analysisId,_this.status,const DeepCollectionEquality().hash(_this.progress),const DeepCollectionEquality().hash(_this.dates));
+  return Object.hash(runtimeType,_this.analysisId,_this.status,const DeepCollectionEquality().hash(_this.progress),_this.fixture,const DeepCollectionEquality().hash(_this.dates));
 }
 
 @override
 String toString() {
   final _this = this as DatesPayload;
-  return 'DatesPayload(analysisId: ${_this.analysisId}, status: ${_this.status}, progress: ${_this.progress}, dates: ${_this.dates})';
+  return 'DatesPayload(analysisId: ${_this.analysisId}, status: ${_this.status}, progress: ${_this.progress}, fixture: ${_this.fixture}, dates: ${_this.dates})';
 }
 
 
@@ -987,11 +1263,11 @@ abstract mixin class $DatesPayloadCopyWith<$Res>  {
   factory $DatesPayloadCopyWith(DatesPayload value, $Res Function(DatesPayload) _then) = _$DatesPayloadCopyWithImpl;
 @useResult
 $Res call({
-@JsonKey(name: 'analysis_id') String analysisId, String status, Map<String, dynamic>? progress, List<DateSummary> dates
+@JsonKey(name: 'analysis_id') String analysisId, String status, Map<String, dynamic>? progress, Fixture? fixture, List<DateSummary> dates
 });
 
 
-
+$FixtureCopyWith<$Res>? get fixture;
 
 }
 /// @nodoc
@@ -1004,16 +1280,29 @@ class _$DatesPayloadCopyWithImpl<$Res>
 
 /// Create a copy of DatesPayload
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? analysisId = null,Object? status = null,Object? progress = freezed,Object? dates = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? analysisId = null,Object? status = null,Object? progress = freezed,Object? fixture = freezed,Object? dates = null,}) {
   return _then(DatesPayload(
 analysisId: null == analysisId ? _self.analysisId : analysisId // ignore: cast_nullable_to_non_nullable
 as String,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
 as String,progress: freezed == progress ? _self.progress : progress // ignore: cast_nullable_to_non_nullable
-as Map<String, dynamic>?,dates: null == dates ? _self.dates : dates // ignore: cast_nullable_to_non_nullable
+as Map<String, dynamic>?,fixture: freezed == fixture ? _self.fixture : fixture // ignore: cast_nullable_to_non_nullable
+as Fixture?,dates: null == dates ? _self.dates : dates // ignore: cast_nullable_to_non_nullable
 as List<DateSummary>,
   ));
 }
+/// Create a copy of DatesPayload
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$FixtureCopyWith<$Res>? get fixture {
+    if (_self.fixture == null) {
+    return null;
+  }
 
+  return $FixtureCopyWith<$Res>(_self.fixture!, (value) {
+    return _then(_self.copyWith(fixture: value));
+  });
+}
 }
 
 
@@ -1095,10 +1384,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(name: 'analysis_id')  String analysisId,  String status,  Map<String, dynamic>? progress,  List<DateSummary> dates)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(name: 'analysis_id')  String analysisId,  String status,  Map<String, dynamic>? progress,  Fixture? fixture,  List<DateSummary> dates)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _DatesPayload() when $default != null:
-return $default(_that.analysisId,_that.status,_that.progress,_that.dates);case _:
+return $default(_that.analysisId,_that.status,_that.progress,_that.fixture,_that.dates);case _:
   return orElse();
 
 }
@@ -1116,10 +1405,10 @@ return $default(_that.analysisId,_that.status,_that.progress,_that.dates);case _
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(name: 'analysis_id')  String analysisId,  String status,  Map<String, dynamic>? progress,  List<DateSummary> dates)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(name: 'analysis_id')  String analysisId,  String status,  Map<String, dynamic>? progress,  Fixture? fixture,  List<DateSummary> dates)  $default,) {final _that = this;
 switch (_that) {
 case _DatesPayload():
-return $default(_that.analysisId,_that.status,_that.progress,_that.dates);case _:
+return $default(_that.analysisId,_that.status,_that.progress,_that.fixture,_that.dates);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -1136,10 +1425,10 @@ return $default(_that.analysisId,_that.status,_that.progress,_that.dates);case _
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(name: 'analysis_id')  String analysisId,  String status,  Map<String, dynamic>? progress,  List<DateSummary> dates)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(name: 'analysis_id')  String analysisId,  String status,  Map<String, dynamic>? progress,  Fixture? fixture,  List<DateSummary> dates)?  $default,) {final _that = this;
 switch (_that) {
 case _DatesPayload() when $default != null:
-return $default(_that.analysisId,_that.status,_that.progress,_that.dates);case _:
+return $default(_that.analysisId,_that.status,_that.progress,_that.fixture,_that.dates);case _:
   return null;
 
 }
@@ -1151,7 +1440,7 @@ return $default(_that.analysisId,_that.status,_that.progress,_that.dates);case _
 @JsonSerializable()
 
 class _DatesPayload implements DatesPayload {
-  const _DatesPayload({@JsonKey(name: 'analysis_id') required this.analysisId, required this.status,  Map<String, dynamic>? progress,  List<DateSummary> dates = const <DateSummary>[]}): _progress = progress,_dates = dates;
+  const _DatesPayload({@JsonKey(name: 'analysis_id') required this.analysisId, required this.status,  Map<String, dynamic>? progress, this.fixture,  List<DateSummary> dates = const <DateSummary>[]}): _progress = progress,_dates = dates;
   factory _DatesPayload.fromJson(Map<String, dynamic> json) => _$DatesPayloadFromJson(json);
 
 @override@JsonKey(name: 'analysis_id') final  String analysisId;
@@ -1165,6 +1454,7 @@ class _DatesPayload implements DatesPayload {
   return EqualUnmodifiableMapView(value);
 }
 
+@override final  Fixture? fixture;
  final  List<DateSummary> _dates;
 @override@JsonKey() List<DateSummary> get dates {
   if (_dates is EqualUnmodifiableListView) return _dates;
@@ -1186,18 +1476,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _DatesPayload&&(identical(other.analysisId, analysisId) || other.analysisId == analysisId)&&(identical(other.status, status) || other.status == status)&&const DeepCollectionEquality().equals(other.progress, _progress)&&const DeepCollectionEquality().equals(other.dates, _dates));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _DatesPayload&&(identical(other.analysisId, analysisId) || other.analysisId == analysisId)&&(identical(other.status, status) || other.status == status)&&const DeepCollectionEquality().equals(other.progress, _progress)&&(identical(other.fixture, fixture) || other.fixture == fixture)&&const DeepCollectionEquality().equals(other.dates, _dates));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
-    return Object.hash(runtimeType,analysisId,status,const DeepCollectionEquality().hash(_progress),const DeepCollectionEquality().hash(_dates));
+    return Object.hash(runtimeType,analysisId,status,const DeepCollectionEquality().hash(_progress),fixture,const DeepCollectionEquality().hash(_dates));
 }
 
 @override
 String toString() {
-    return 'DatesPayload(analysisId: $analysisId, status: $status, progress: $progress, dates: $dates)';
+    return 'DatesPayload(analysisId: $analysisId, status: $status, progress: $progress, fixture: $fixture, dates: $dates)';
 }
 
 
@@ -1208,11 +1498,11 @@ abstract mixin class _$DatesPayloadCopyWith<$Res> implements $DatesPayloadCopyWi
   factory _$DatesPayloadCopyWith(_DatesPayload value, $Res Function(_DatesPayload) _then) = __$DatesPayloadCopyWithImpl;
 @override @useResult
 $Res call({
-@JsonKey(name: 'analysis_id') String analysisId, String status, Map<String, dynamic>? progress, List<DateSummary> dates
+@JsonKey(name: 'analysis_id') String analysisId, String status, Map<String, dynamic>? progress, Fixture? fixture, List<DateSummary> dates
 });
 
 
-
+@override $FixtureCopyWith<$Res>? get fixture;
 
 }
 /// @nodoc
@@ -1225,17 +1515,30 @@ class __$DatesPayloadCopyWithImpl<$Res>
 
 /// Create a copy of DatesPayload
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? analysisId = null,Object? status = null,Object? progress = freezed,Object? dates = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? analysisId = null,Object? status = null,Object? progress = freezed,Object? fixture = freezed,Object? dates = null,}) {
   return _then(_DatesPayload(
 analysisId: null == analysisId ? _self.analysisId : analysisId // ignore: cast_nullable_to_non_nullable
 as String,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
 as String,progress: freezed == progress ? _self._progress : progress // ignore: cast_nullable_to_non_nullable
-as Map<String, dynamic>?,dates: null == dates ? _self._dates : dates // ignore: cast_nullable_to_non_nullable
+as Map<String, dynamic>?,fixture: freezed == fixture ? _self.fixture : fixture // ignore: cast_nullable_to_non_nullable
+as Fixture?,dates: null == dates ? _self._dates : dates // ignore: cast_nullable_to_non_nullable
 as List<DateSummary>,
   ));
 }
 
+/// Create a copy of DatesPayload
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$FixtureCopyWith<$Res>? get fixture {
+    if (_self.fixture == null) {
+    return null;
+  }
 
+  return $FixtureCopyWith<$Res>(_self.fixture!, (value) {
+    return _then(_self.copyWith(fixture: value));
+  });
+}
 }
 
 

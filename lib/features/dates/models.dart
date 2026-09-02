@@ -57,7 +57,12 @@ abstract class DateSummary with _$DateSummary {
     @JsonKey(name: 'setting_name') @Default('') String settingName,
     @Default('') String description,
     @JsonKey(name: 'sensory_details') @Default('') String sensoryDetails,
-    @JsonKey(name: 'anchored_in_interest') @Default('') String anchoredInInterest,
+    // The archetype key this analysis drew — the SAME on every date of an
+    // analysis, which is the whole point. Empty on dates from before
+    // 2026-09-02, which each had their own interest-anchored setting and no
+    // archetype. It replaced `anchored_in_interest`, which described a
+    // property the fixture deliberately no longer has.
+    @Default('') String archetype,
     @JsonKey(name: 'message_count') @Default(0) int messageCount,
     @JsonKey(name: 'turn_count') @Default(0) int turnCount,
     String? error,
@@ -70,12 +75,33 @@ abstract class DateSummary with _$DateSummary {
       _$DateSummaryFromJson(json);
 }
 
+/// The one evening every candidate in an analysis was run against.
+///
+/// It is shipped as its own object rather than inferred by comparing three
+/// `settingName` strings, because "they all went to the same place, so these
+/// scores compare" is the claim the results screen rests on — and a claim the
+/// client works out by string comparison is a claim it can get wrong.
+@freezed
+abstract class Fixture with _$Fixture {
+  const factory Fixture({
+    @JsonKey(name: 'setting_name') @Default('') String settingName,
+    @Default('') String archetype,
+    @JsonKey(name: 'dates_per_candidate') @Default(1) int datesPerCandidate,
+  }) = _Fixture;
+
+  factory Fixture.fromJson(Map<String, dynamic> json) => _$FixtureFromJson(json);
+}
+
 @freezed
 abstract class DatesPayload with _$DatesPayload {
   const factory DatesPayload({
     @JsonKey(name: 'analysis_id') required String analysisId,
     required String status,
     Map<String, dynamic>? progress,
+    // Null for an analysis that ran before the shared fixture existed. Those
+    // genuinely had none — each date had its own setting — and the screen has
+    // to be able to say nothing rather than claim a fixture that never was.
+    Fixture? fixture,
     @Default(<DateSummary>[]) List<DateSummary> dates,
   }) = _DatesPayload;
 

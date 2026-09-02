@@ -64,7 +64,7 @@ _DateSummary _$DateSummaryFromJson(Map<String, dynamic> json) => _DateSummary(
   settingName: json['setting_name'] as String? ?? '',
   description: json['description'] as String? ?? '',
   sensoryDetails: json['sensory_details'] as String? ?? '',
-  anchoredInInterest: json['anchored_in_interest'] as String? ?? '',
+  archetype: json['archetype'] as String? ?? '',
   messageCount: (json['message_count'] as num?)?.toInt() ?? 0,
   turnCount: (json['turn_count'] as num?)?.toInt() ?? 0,
   error: json['error'] as String?,
@@ -85,7 +85,7 @@ Map<String, dynamic> _$DateSummaryToJson(_DateSummary instance) =>
       'setting_name': instance.settingName,
       'description': instance.description,
       'sensory_details': instance.sensoryDetails,
-      'anchored_in_interest': instance.anchoredInInterest,
+      'archetype': instance.archetype,
       'message_count': instance.messageCount,
       'turn_count': instance.turnCount,
       'error': instance.error,
@@ -94,11 +94,26 @@ Map<String, dynamic> _$DateSummaryToJson(_DateSummary instance) =>
       'excluded_from_score': instance.excludedFromScore,
     };
 
+_Fixture _$FixtureFromJson(Map<String, dynamic> json) => _Fixture(
+  settingName: json['setting_name'] as String? ?? '',
+  archetype: json['archetype'] as String? ?? '',
+  datesPerCandidate: (json['dates_per_candidate'] as num?)?.toInt() ?? 1,
+);
+
+Map<String, dynamic> _$FixtureToJson(_Fixture instance) => <String, dynamic>{
+  'setting_name': instance.settingName,
+  'archetype': instance.archetype,
+  'dates_per_candidate': instance.datesPerCandidate,
+};
+
 _DatesPayload _$DatesPayloadFromJson(Map<String, dynamic> json) =>
     _DatesPayload(
       analysisId: json['analysis_id'] as String,
       status: json['status'] as String,
       progress: json['progress'] as Map<String, dynamic>?,
+      fixture: json['fixture'] == null
+          ? null
+          : Fixture.fromJson(json['fixture'] as Map<String, dynamic>),
       dates:
           (json['dates'] as List<dynamic>?)
               ?.map((e) => DateSummary.fromJson(e as Map<String, dynamic>))
@@ -111,6 +126,7 @@ Map<String, dynamic> _$DatesPayloadToJson(_DatesPayload instance) =>
       'analysis_id': instance.analysisId,
       'status': instance.status,
       'progress': instance.progress,
+      'fixture': instance.fixture,
       'dates': instance.dates,
     };
 

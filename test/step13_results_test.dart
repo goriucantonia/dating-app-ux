@@ -359,11 +359,36 @@ Future<void> _pumpTall(WidgetTester tester, Widget app) async {
   await tester.pumpWidget(app);
 }
 
+/// An analysis from BEFORE the shared fixture (2026-09-02): every candidate
+/// on a different evening, and `fixture` null because there genuinely was
+/// none. Kept as the main fixture so the rest of the suite goes on exercising
+/// the mixed-settings rendering that real stored analyses still have.
 _FakeDates _completeDates() => _FakeDates(
       payload: DatesPayload(
         analysisId: 'a1',
         status: 'complete',
         dates: [_bobDate1, _bobDate2, _danDate, _carolDate],
+      ),
+      transcripts: {'d-dan': _transcript},
+    );
+
+/// The shape every new analysis has: one drawn archetype, one setting, and
+/// every candidate run against it.
+_FakeDates _sharedFixtureDates() => _FakeDates(
+      payload: DatesPayload(
+        analysisId: 'a1',
+        status: 'complete',
+        fixture: const Fixture(
+          settingName: 'the late show at the Roxy',
+          archetype: 'cinema',
+        ),
+        dates: [
+          for (final d in [_bobDate1, _danDate])
+            d.copyWith(
+              settingName: 'the late show at the Roxy',
+              archetype: 'cinema',
+            ),
+        ],
       ),
       transcripts: {'d-dan': _transcript},
     );
@@ -491,6 +516,33 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.textContaining('too short to judge'), findsOneWidget);
     expect(find.textContaining('6 turns were spoken'), findsOneWidget);
+  });
+
+  testWidgets('results: the shared fixture is stated, and only when there is one',
+      (tester) async {
+    // The masthead used to print "— the same for every candidate" under a
+    // list of DIFFERENT settings, which was false. It now reads the server's
+    // `fixture` object, and says the other thing when there is none.
+    await _pumpTall(tester, _app(
+      initial: '/analyses/a1/results',
+      analyses: _FakeAnalyses([_completeAnalysis]),
+      dates: _sharedFixtureDates(),
+    ));
+    await tester.pumpAndSettle();
+    expect(find.text('THE SAME EVENING'), findsOneWidget); // Tag upper-cases
+    // Once in the masthead and once on each of the two date cards -- which
+    // is itself the point: the same name, not three names.
+    expect(find.text('the late show at the Roxy'), findsNWidgets(3));
+    expect(find.textContaining('every candidate went here'), findsOneWidget);
+
+    await _pumpTall(tester, _app(
+      initial: '/analyses/a1/results',
+      analyses: _FakeAnalyses([_completeAnalysis]),
+      dates: _completeDates(), // no fixture: a pre-2026-09-02 analysis
+    ));
+    await tester.pumpAndSettle();
+    expect(find.text('THE SAME EVENING'), findsNothing);
+    expect(find.textContaining('a different one per candidate'), findsOneWidget);
   });
 
   testWidgets('results: a clash is a sentence naming both traits, with the moment',
