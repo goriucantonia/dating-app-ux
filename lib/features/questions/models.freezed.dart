@@ -16,7 +16,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$Question {
 
- String get id; String get origin; String? get code;@JsonKey(name: 'pool_order') int? get poolOrder;@JsonKey(name: 'probe_area') String get probeArea; String get text; bool get answered;@JsonKey(name: 'answer_text') String? get answerText;@JsonKey(name: 'answer_updated_at') String? get answerUpdatedAt;
+ String get id; String get origin; String? get code;@JsonKey(name: 'pool_order') int? get poolOrder;@JsonKey(name: 'probe_area') String get probeArea; String get text; bool get answered;@JsonKey(name: 'answer_text') String? get answerText;@JsonKey(name: 'answer_updated_at') String? get answerUpdatedAt;@JsonKey(name: 'trait_id') String? get traitId;
 /// Create a copy of Question
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -30,20 +30,20 @@ $QuestionCopyWith<Question> get copyWith => _$QuestionCopyWithImpl<Question>(thi
 @override
 bool operator ==(Object other) {
   final _this = this as Question;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Question&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.origin, _this.origin) || other.origin == _this.origin)&&(identical(other.code, _this.code) || other.code == _this.code)&&(identical(other.poolOrder, _this.poolOrder) || other.poolOrder == _this.poolOrder)&&(identical(other.probeArea, _this.probeArea) || other.probeArea == _this.probeArea)&&(identical(other.text, _this.text) || other.text == _this.text)&&(identical(other.answered, _this.answered) || other.answered == _this.answered)&&(identical(other.answerText, _this.answerText) || other.answerText == _this.answerText)&&(identical(other.answerUpdatedAt, _this.answerUpdatedAt) || other.answerUpdatedAt == _this.answerUpdatedAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Question&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.origin, _this.origin) || other.origin == _this.origin)&&(identical(other.code, _this.code) || other.code == _this.code)&&(identical(other.poolOrder, _this.poolOrder) || other.poolOrder == _this.poolOrder)&&(identical(other.probeArea, _this.probeArea) || other.probeArea == _this.probeArea)&&(identical(other.text, _this.text) || other.text == _this.text)&&(identical(other.answered, _this.answered) || other.answered == _this.answered)&&(identical(other.answerText, _this.answerText) || other.answerText == _this.answerText)&&(identical(other.answerUpdatedAt, _this.answerUpdatedAt) || other.answerUpdatedAt == _this.answerUpdatedAt)&&(identical(other.traitId, _this.traitId) || other.traitId == _this.traitId));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
   final _this = this as Question;
-  return Object.hash(runtimeType,_this.id,_this.origin,_this.code,_this.poolOrder,_this.probeArea,_this.text,_this.answered,_this.answerText,_this.answerUpdatedAt);
+  return Object.hash(runtimeType,_this.id,_this.origin,_this.code,_this.poolOrder,_this.probeArea,_this.text,_this.answered,_this.answerText,_this.answerUpdatedAt,_this.traitId);
 }
 
 @override
 String toString() {
   final _this = this as Question;
-  return 'Question(id: ${_this.id}, origin: ${_this.origin}, code: ${_this.code}, poolOrder: ${_this.poolOrder}, probeArea: ${_this.probeArea}, text: ${_this.text}, answered: ${_this.answered}, answerText: ${_this.answerText}, answerUpdatedAt: ${_this.answerUpdatedAt})';
+  return 'Question(id: ${_this.id}, origin: ${_this.origin}, code: ${_this.code}, poolOrder: ${_this.poolOrder}, probeArea: ${_this.probeArea}, text: ${_this.text}, answered: ${_this.answered}, answerText: ${_this.answerText}, answerUpdatedAt: ${_this.answerUpdatedAt}, traitId: ${_this.traitId})';
 }
 
 
@@ -54,7 +54,7 @@ abstract mixin class $QuestionCopyWith<$Res>  {
   factory $QuestionCopyWith(Question value, $Res Function(Question) _then) = _$QuestionCopyWithImpl;
 @useResult
 $Res call({
- String id, String origin, String? code,@JsonKey(name: 'pool_order') int? poolOrder,@JsonKey(name: 'probe_area') String probeArea, String text, bool answered,@JsonKey(name: 'answer_text') String? answerText,@JsonKey(name: 'answer_updated_at') String? answerUpdatedAt
+ String id, String origin, String? code,@JsonKey(name: 'pool_order') int? poolOrder,@JsonKey(name: 'probe_area') String probeArea, String text, bool answered,@JsonKey(name: 'answer_text') String? answerText,@JsonKey(name: 'answer_updated_at') String? answerUpdatedAt,@JsonKey(name: 'trait_id') String? traitId
 });
 
 
@@ -71,7 +71,7 @@ class _$QuestionCopyWithImpl<$Res>
 
 /// Create a copy of Question
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? origin = null,Object? code = freezed,Object? poolOrder = freezed,Object? probeArea = null,Object? text = null,Object? answered = null,Object? answerText = freezed,Object? answerUpdatedAt = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? origin = null,Object? code = freezed,Object? poolOrder = freezed,Object? probeArea = null,Object? text = null,Object? answered = null,Object? answerText = freezed,Object? answerUpdatedAt = freezed,Object? traitId = freezed,}) {
   return _then(Question(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,origin: null == origin ? _self.origin : origin // ignore: cast_nullable_to_non_nullable
@@ -82,6 +82,7 @@ as String,text: null == text ? _self.text : text // ignore: cast_nullable_to_non
 as String,answered: null == answered ? _self.answered : answered // ignore: cast_nullable_to_non_nullable
 as bool,answerText: freezed == answerText ? _self.answerText : answerText // ignore: cast_nullable_to_non_nullable
 as String?,answerUpdatedAt: freezed == answerUpdatedAt ? _self.answerUpdatedAt : answerUpdatedAt // ignore: cast_nullable_to_non_nullable
+as String?,traitId: freezed == traitId ? _self.traitId : traitId // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
 }
@@ -167,10 +168,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String origin,  String? code, @JsonKey(name: 'pool_order')  int? poolOrder, @JsonKey(name: 'probe_area')  String probeArea,  String text,  bool answered, @JsonKey(name: 'answer_text')  String? answerText, @JsonKey(name: 'answer_updated_at')  String? answerUpdatedAt)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String origin,  String? code, @JsonKey(name: 'pool_order')  int? poolOrder, @JsonKey(name: 'probe_area')  String probeArea,  String text,  bool answered, @JsonKey(name: 'answer_text')  String? answerText, @JsonKey(name: 'answer_updated_at')  String? answerUpdatedAt, @JsonKey(name: 'trait_id')  String? traitId)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Question() when $default != null:
-return $default(_that.id,_that.origin,_that.code,_that.poolOrder,_that.probeArea,_that.text,_that.answered,_that.answerText,_that.answerUpdatedAt);case _:
+return $default(_that.id,_that.origin,_that.code,_that.poolOrder,_that.probeArea,_that.text,_that.answered,_that.answerText,_that.answerUpdatedAt,_that.traitId);case _:
   return orElse();
 
 }
@@ -188,10 +189,10 @@ return $default(_that.id,_that.origin,_that.code,_that.poolOrder,_that.probeArea
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String origin,  String? code, @JsonKey(name: 'pool_order')  int? poolOrder, @JsonKey(name: 'probe_area')  String probeArea,  String text,  bool answered, @JsonKey(name: 'answer_text')  String? answerText, @JsonKey(name: 'answer_updated_at')  String? answerUpdatedAt)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String origin,  String? code, @JsonKey(name: 'pool_order')  int? poolOrder, @JsonKey(name: 'probe_area')  String probeArea,  String text,  bool answered, @JsonKey(name: 'answer_text')  String? answerText, @JsonKey(name: 'answer_updated_at')  String? answerUpdatedAt, @JsonKey(name: 'trait_id')  String? traitId)  $default,) {final _that = this;
 switch (_that) {
 case _Question():
-return $default(_that.id,_that.origin,_that.code,_that.poolOrder,_that.probeArea,_that.text,_that.answered,_that.answerText,_that.answerUpdatedAt);case _:
+return $default(_that.id,_that.origin,_that.code,_that.poolOrder,_that.probeArea,_that.text,_that.answered,_that.answerText,_that.answerUpdatedAt,_that.traitId);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -208,10 +209,10 @@ return $default(_that.id,_that.origin,_that.code,_that.poolOrder,_that.probeArea
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String origin,  String? code, @JsonKey(name: 'pool_order')  int? poolOrder, @JsonKey(name: 'probe_area')  String probeArea,  String text,  bool answered, @JsonKey(name: 'answer_text')  String? answerText, @JsonKey(name: 'answer_updated_at')  String? answerUpdatedAt)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String origin,  String? code, @JsonKey(name: 'pool_order')  int? poolOrder, @JsonKey(name: 'probe_area')  String probeArea,  String text,  bool answered, @JsonKey(name: 'answer_text')  String? answerText, @JsonKey(name: 'answer_updated_at')  String? answerUpdatedAt, @JsonKey(name: 'trait_id')  String? traitId)?  $default,) {final _that = this;
 switch (_that) {
 case _Question() when $default != null:
-return $default(_that.id,_that.origin,_that.code,_that.poolOrder,_that.probeArea,_that.text,_that.answered,_that.answerText,_that.answerUpdatedAt);case _:
+return $default(_that.id,_that.origin,_that.code,_that.poolOrder,_that.probeArea,_that.text,_that.answered,_that.answerText,_that.answerUpdatedAt,_that.traitId);case _:
   return null;
 
 }
@@ -223,7 +224,7 @@ return $default(_that.id,_that.origin,_that.code,_that.poolOrder,_that.probeArea
 @JsonSerializable()
 
 class _Question implements Question {
-  const _Question({required this.id, required this.origin, this.code, @JsonKey(name: 'pool_order') this.poolOrder, @JsonKey(name: 'probe_area') required this.probeArea, required this.text, required this.answered, @JsonKey(name: 'answer_text') this.answerText, @JsonKey(name: 'answer_updated_at') this.answerUpdatedAt});
+  const _Question({required this.id, required this.origin, this.code, @JsonKey(name: 'pool_order') this.poolOrder, @JsonKey(name: 'probe_area') required this.probeArea, required this.text, required this.answered, @JsonKey(name: 'answer_text') this.answerText, @JsonKey(name: 'answer_updated_at') this.answerUpdatedAt, @JsonKey(name: 'trait_id') this.traitId});
   factory _Question.fromJson(Map<String, dynamic> json) => _$QuestionFromJson(json);
 
 @override final  String id;
@@ -235,6 +236,7 @@ class _Question implements Question {
 @override final  bool answered;
 @override@JsonKey(name: 'answer_text') final  String? answerText;
 @override@JsonKey(name: 'answer_updated_at') final  String? answerUpdatedAt;
+@override@JsonKey(name: 'trait_id') final  String? traitId;
 
 /// Create a copy of Question
 /// with the given fields replaced by the non-null parameter values.
@@ -249,18 +251,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _Question&&(identical(other.id, id) || other.id == id)&&(identical(other.origin, origin) || other.origin == origin)&&(identical(other.code, code) || other.code == code)&&(identical(other.poolOrder, poolOrder) || other.poolOrder == poolOrder)&&(identical(other.probeArea, probeArea) || other.probeArea == probeArea)&&(identical(other.text, text) || other.text == text)&&(identical(other.answered, answered) || other.answered == answered)&&(identical(other.answerText, answerText) || other.answerText == answerText)&&(identical(other.answerUpdatedAt, answerUpdatedAt) || other.answerUpdatedAt == answerUpdatedAt));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _Question&&(identical(other.id, id) || other.id == id)&&(identical(other.origin, origin) || other.origin == origin)&&(identical(other.code, code) || other.code == code)&&(identical(other.poolOrder, poolOrder) || other.poolOrder == poolOrder)&&(identical(other.probeArea, probeArea) || other.probeArea == probeArea)&&(identical(other.text, text) || other.text == text)&&(identical(other.answered, answered) || other.answered == answered)&&(identical(other.answerText, answerText) || other.answerText == answerText)&&(identical(other.answerUpdatedAt, answerUpdatedAt) || other.answerUpdatedAt == answerUpdatedAt)&&(identical(other.traitId, traitId) || other.traitId == traitId));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
-    return Object.hash(runtimeType,id,origin,code,poolOrder,probeArea,text,answered,answerText,answerUpdatedAt);
+    return Object.hash(runtimeType,id,origin,code,poolOrder,probeArea,text,answered,answerText,answerUpdatedAt,traitId);
 }
 
 @override
 String toString() {
-    return 'Question(id: $id, origin: $origin, code: $code, poolOrder: $poolOrder, probeArea: $probeArea, text: $text, answered: $answered, answerText: $answerText, answerUpdatedAt: $answerUpdatedAt)';
+    return 'Question(id: $id, origin: $origin, code: $code, poolOrder: $poolOrder, probeArea: $probeArea, text: $text, answered: $answered, answerText: $answerText, answerUpdatedAt: $answerUpdatedAt, traitId: $traitId)';
 }
 
 
@@ -271,7 +273,7 @@ abstract mixin class _$QuestionCopyWith<$Res> implements $QuestionCopyWith<$Res>
   factory _$QuestionCopyWith(_Question value, $Res Function(_Question) _then) = __$QuestionCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String origin, String? code,@JsonKey(name: 'pool_order') int? poolOrder,@JsonKey(name: 'probe_area') String probeArea, String text, bool answered,@JsonKey(name: 'answer_text') String? answerText,@JsonKey(name: 'answer_updated_at') String? answerUpdatedAt
+ String id, String origin, String? code,@JsonKey(name: 'pool_order') int? poolOrder,@JsonKey(name: 'probe_area') String probeArea, String text, bool answered,@JsonKey(name: 'answer_text') String? answerText,@JsonKey(name: 'answer_updated_at') String? answerUpdatedAt,@JsonKey(name: 'trait_id') String? traitId
 });
 
 
@@ -288,7 +290,7 @@ class __$QuestionCopyWithImpl<$Res>
 
 /// Create a copy of Question
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? origin = null,Object? code = freezed,Object? poolOrder = freezed,Object? probeArea = null,Object? text = null,Object? answered = null,Object? answerText = freezed,Object? answerUpdatedAt = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? origin = null,Object? code = freezed,Object? poolOrder = freezed,Object? probeArea = null,Object? text = null,Object? answered = null,Object? answerText = freezed,Object? answerUpdatedAt = freezed,Object? traitId = freezed,}) {
   return _then(_Question(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,origin: null == origin ? _self.origin : origin // ignore: cast_nullable_to_non_nullable
@@ -299,6 +301,7 @@ as String,text: null == text ? _self.text : text // ignore: cast_nullable_to_non
 as String,answered: null == answered ? _self.answered : answered // ignore: cast_nullable_to_non_nullable
 as bool,answerText: freezed == answerText ? _self.answerText : answerText // ignore: cast_nullable_to_non_nullable
 as String?,answerUpdatedAt: freezed == answerUpdatedAt ? _self.answerUpdatedAt : answerUpdatedAt // ignore: cast_nullable_to_non_nullable
+as String?,traitId: freezed == traitId ? _self.traitId : traitId // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
 }

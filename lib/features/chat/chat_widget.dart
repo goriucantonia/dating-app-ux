@@ -109,6 +109,19 @@ class _ChatViewState extends State<ChatView> {
   /// The last text whose send failed — shown as "unsent" under the composer
   /// until it goes through (S14-U6).
   String? _unsent;
+  int _renderedCount = -1;
+
+  /// Scroll to the newest line AFTER it has been laid out. The old
+  /// `animateTo(maxScrollExtent)` ran in the same frame as the append, so
+  /// it measured the list before the reply existed; history opened at the
+  /// oldest message and every reply landed below the fold (audit
+  /// 2026-09-02).
+  void _scrollToEndAfterLayout() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || !_scroll.hasClients) return;
+      _scroll.jumpTo(_scroll.position.maxScrollExtent);
+    });
+  }
 
   @override
   void dispose() {
@@ -160,6 +173,11 @@ class _ChatViewState extends State<ChatView> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final typing = widget.sending && widget.typingLabel != null;
+    final count = widget.bubbles.length + (typing ? 1 : 0);
+    if (count != _renderedCount) {
+      _renderedCount = count;
+      _scrollToEndAfterLayout();
+    }
     return Column(
       children: [
         if (widget.banner != null) widget.banner!,

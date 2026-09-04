@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -59,14 +61,26 @@ class _Body extends ConsumerWidget {
     if (live.isEmpty) {
       return ListView(
         padding: const EdgeInsets.all(24),
-        children: const [
-          SizedBox(height: 48),
-          _PersonaHeaderSlot(),
-          SizedBox(height: 24),
-          Center(
+        children: [
+          const SizedBox(height: 48),
+          const _PersonaHeaderSlot(),
+          const SizedBox(height: 24),
+          const Center(
             child: Text(
               "Nothing here yet — your answers haven't been read into traits.",
               textAlign: TextAlign.center,
+            ),
+          ),
+          const SizedBox(height: 16),
+          // A way to get here from nowhere (audit 2026-09-02): this state was
+          // reachable — a timed-out extraction, "Not now" on a failed build
+          // — and offered nothing that re-runs the reading.
+          Center(
+            child: FilledButton.icon(
+              onPressed: () => context.go(
+                  '/onboarding/building?to=${Uri.encodeComponent('/profile')}'),
+              icon: const Icon(Icons.auto_awesome),
+              label: const Text('Read my answers now'),
             ),
           ),
         ],
@@ -84,7 +98,10 @@ class _Body extends ConsumerWidget {
           style: Theme.of(context).textTheme.titleMedium,
         ),
       ));
-      sections.addAll(rows.map((t) => _TraitCard(trait: t)));
+      // Keyed by id: an unkeyed stateful card re-attached by INDEX after a
+      // refetch reordered the list, showing one trait's label with another's
+      // local status (audit 2026-09-02).
+      sections.addAll(rows.map((t) => _TraitCard(key: ValueKey(t.id), trait: t)));
     }
 
     return ListView(
@@ -187,13 +204,44 @@ class _WaitingCorrections extends ConsumerWidget {
 }
 
 /// S8-U4. Snapshot state, and the one place a rebuild is offered by hand.
-class _PersonaHeaderSlot extends ConsumerWidget {
+///
+/// Polls while a rebuild is in flight (audit 2026-09-02): the header used to
+/// read `compiling` once and say "Rebuilding…" until someone pulled to
+/// refresh, because `personaProvider` is a cached one-shot read.
+class _PersonaHeaderSlot extends ConsumerStatefulWidget {
   const _PersonaHeaderSlot();
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<_PersonaHeaderSlot> createState() => _PersonaHeaderSlotState();
+}
+
+class _PersonaHeaderSlotState extends ConsumerState<_PersonaHeaderSlot> {
+  Timer? _refresh;
+
+  @override
+  void dispose() {
+    _refresh?.cancel();
+    super.dispose();
+  }
+
+  void _pollWhileCompiling(bool compiling) {
+    if (!compiling) {
+      _refresh?.cancel();
+      _refresh = null;
+      return;
+    }
+    _refresh ??= Timer(const Duration(seconds: 3), () {
+      _refresh = null;
+      if (mounted) ref.invalidate(personaProvider);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final persona = ref.watch(personaProvider);
+    _pollWhileCompiling(persona.valueOrNull?.snapshot?.status == 'compiling');
     return persona.when(
+      skipLoadingOnReload: true, // keep the card up while the poll re-reads
       loading: () => const SizedBox(height: 4, child: LinearProgressIndicator()),
       error: (_, _) => const SizedBox.shrink(),
       data: (state) {
@@ -216,8 +264,13 @@ class _PersonaHeaderSlot extends ConsumerWidget {
           return _HeaderCard(
             icon: Icons.error_outline,
             tone: _Tone.error,
-            text: 'The last rebuild didn’t finish. Your previous version is '
-                'still in use.',
+            // `simulatable` is the server's word for "a usable version
+            // exists"; without it there is no previous version to fall back
+            // on and the old sentence claimed one.
+            text: state.simulatable
+                ? 'The last rebuild didn’t finish. Your previous version is '
+                    'still in use.'
+                : 'Building your AI self didn’t finish.',
             actionLabel: 'Try again',
             onAction: () => _rebuild(context, ref),
           );
@@ -311,7 +364,7 @@ class _HeaderCard extends StatelessWidget {
 /// stubborn" is absurd theater, and a number invites arguing with the decimal
 /// instead of the claim (named trade).
 class _TraitCard extends ConsumerStatefulWidget {
-  const _TraitCard({required this.trait});
+  const _TraitCard({super.key, required this.trait});
 
   final Trait trait;
 
@@ -322,6 +375,14 @@ class _TraitCard extends ConsumerStatefulWidget {
 class _TraitCardState extends ConsumerState<_TraitCard> {
   late String _status = widget.trait.status;
   bool _busy = false;
+
+  @override
+  void didUpdateWidget(_TraitCard old) {
+    super.didUpdateWidget(old);
+    // The payload is the truth once it is refetched; the local copy only
+    // exists to be optimistic for the second between tap and response.
+    if (old.trait.status != widget.trait.status) _status = widget.trait.status;
+  }
 
   Future<void> _confirm() async {
     final previous = _status;
@@ -334,12 +395,13 @@ class _TraitCardState extends ConsumerState<_TraitCard> {
     try {
       await ref.read(traitsRepositoryProvider).confirm(widget.trait.id);
       ref.invalidate(personaProvider); // status change moves traits_hash
+      ref.invalidate(traitsProvider); // and the list is the truth, not this card
     } on ApiException catch (e) {
       if (mounted) setState(() => _status = previous); // rollback
       messenger.showSnackBar(SnackBar(content: Text(e.message)));
     } catch (e) {
       if (mounted) setState(() => _status = previous);
-      messenger.showSnackBar(SnackBar(content: Text('$e')));
+      messenger.showSnackBar(SnackBar(content: Text('Something went wrong on this device. Please try again.')));
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -358,6 +420,7 @@ class _TraitCardState extends ConsumerState<_TraitCard> {
           await ref.read(traitsRepositoryProvider).dispute(widget.trait.id);
       ref.invalidate(questionsProvider);
       ref.invalidate(personaProvider);
+      ref.invalidate(traitsProvider);
       if (!mounted) return;
       // S8-U3: tell them a question was added, and take them to it. A dispute
       // that only recolours a card leaves the user with no way to correct
@@ -404,7 +467,7 @@ class _TraitCardState extends ConsumerState<_TraitCard> {
       messenger.showSnackBar(SnackBar(content: Text(e.message)));
     } catch (e) {
       if (mounted) setState(() => _status = previous);
-      messenger.showSnackBar(SnackBar(content: Text('$e')));
+      messenger.showSnackBar(SnackBar(content: Text('Something went wrong on this device. Please try again.')));
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -460,10 +523,16 @@ class _TraitCardState extends ConsumerState<_TraitCard> {
                 color: _status == 'inferred' ? scheme.outline : borderColor,
               ),
               const SizedBox(width: 4),
-              Text(note,
-                  style: theme.textTheme.labelSmall?.copyWith(
-                      color: _status == 'inferred' ? scheme.outline : borderColor)),
-              const Spacer(),
+              // Flexible: on a 360 dp phone the note plus two buttons overran
+              // the row (audit 2026-09-02; tests run at 800 px and never saw it).
+              Expanded(
+                child: Text(note,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: theme.textTheme.labelSmall?.copyWith(
+                        color: _status == 'inferred' ? scheme.outline : borderColor)),
+              ),
+              const SizedBox(width: 8),
               if (_busy)
                 const SizedBox(
                     width: 16, height: 16,
@@ -475,9 +544,26 @@ class _TraitCardState extends ConsumerState<_TraitCard> {
                 FilledButton.tonal(
                     onPressed: _confirm, child: const Text("That's right")),
               ] else if (_status == 'disputed')
-                TextButton(
-                    onPressed: () => context.push('/profile/expand'),
-                    child: const Text('Answer the question')),
+                // Routes to THIS trait's own question, now that the server
+                // says which one that is. It used to push the edit list of
+                // already-answered questions — the D-018 dead end, still
+                // there on the card itself (audit 2026-09-02). Hidden when
+                // the question is already answered and the correction is
+                // simply waiting for the next read.
+                Builder(builder: (context) {
+                  final waiting = (ref.watch(questionsProvider).valueOrNull ??
+                          const <Question>[])
+                      .where((q) =>
+                          q.origin == 'dispute' &&
+                          q.traitId == t.id &&
+                          !q.answered)
+                      .firstOrNull;
+                  if (waiting == null) return const SizedBox.shrink();
+                  return TextButton(
+                      onPressed: () =>
+                          context.push('/profile/correct/${waiting.id}'),
+                      child: const Text('Answer the question'));
+                }),
             ],
           ),
         ],

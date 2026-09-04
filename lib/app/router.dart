@@ -1,4 +1,4 @@
-import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -36,13 +36,39 @@ final routerProvider = Provider<GoRouter>((ref) {
     refreshListenable: refresh,
     redirect: (context, state) {
       final auth = ref.read(authControllerProvider);
-      if (auth.isLoading) return null; // '/' renders a spinner meanwhile
-      final signedIn = auth.valueOrNull != null;
       final location = state.matchedLocation;
+      if (auth.isLoading) {
+        // NOTHING builds until the session is known. The old rule returned
+        // null here and the requested screen built at once, fired its
+        // requests before the token had loaded, got a 401, and the
+        // interceptor deleted the saved session (audit 2026-09-02). The
+        // splash carries the original target so a deep link survives.
+        if (location == '/splash') return null;
+        return '/splash?from=${Uri.encodeComponent(state.uri.toString())}';
+      }
+      final signedIn = auth.valueOrNull != null;
+      if (location == '/splash') {
+        final from = _inAppTarget(state.uri.queryParameters['from']);
+        if (!signedIn) {
+          // Carry it through the login too: a link opened cold used to
+          // land on home after the sign-in (review 2026-09-03).
+          return from == null
+              ? '/login'
+              : '/login?from=${Uri.encodeComponent(from)}';
+        }
+        return from ?? '/';
+      }
       final onAuthPage = location == '/login' || location == '/register';
 
-      if (!signedIn) return onAuthPage ? null : '/login';
-      if (onAuthPage) return '/';
+      if (!signedIn) {
+        if (onAuthPage) return null;
+        // Carry the target: a notification link opened while signed out
+        // used to land on home after the sign-in (audit 2026-09-02).
+        return '/login?from=${Uri.encodeComponent(state.uri.toString())}';
+      }
+      if (onAuthPage) {
+        return _inAppTarget(state.uri.queryParameters['from']) ?? '/';
+      }
 
       // Guard 2 — null means "not known yet": never bounce on a guess.
       final incomplete = baselineIncomplete(ref.read(questionsProvider));
@@ -61,6 +87,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       return null;
     },
     routes: [
+      GoRoute(path: '/splash', builder: (_, _) => const _Splash()),
       // Outside the shell: the three screens where a navigation bar would be
       // an invitation to leave something half-finished.
       GoRoute(path: '/login', builder: (_, _) => const LoginScreen()),
@@ -70,7 +97,10 @@ final routerProvider = Provider<GoRouter>((ref) {
           builder: (_, _) => const OnboardingQuestionsScreen()),
       GoRoute(
           path: '/onboarding/building',
-          builder: (_, _) => const BuildingScreen()),
+          // `?to=` names where to land afterwards: '/' for onboarding, the
+          // profile for a re-read after edits or a correction.
+          builder: (_, state) =>
+              BuildingScreen(returnTo: state.uri.queryParameters['to'])),
 
       // S18-U1: everything else lives under the ONE persistent navigation,
       // four branches, each with its own stack. A screen nested under a
@@ -153,3 +183,25 @@ final routerProvider = Provider<GoRouter>((ref) {
     ],
   );
 });
+
+/// A `?from=` value that is safe to land on: an in-app path (never a
+/// scheme or a protocol-relative `//host`), and not one of the holding
+/// screens themselves. Anything else is treated as "no target".
+String? _inAppTarget(String? from) {
+  if (from == null || from.isEmpty) return null;
+  if (!from.startsWith('/') || from.startsWith('//')) return null;
+  for (final holding in const ['/splash', '/login', '/register']) {
+    if (from == holding || from.startsWith('$holding?')) return null;
+  }
+  return from;
+}
+
+/// Shown for the instant between app start and the session being restored.
+/// It exists so that no data screen is built before the token is known.
+class _Splash extends StatelessWidget {
+  const _Splash();
+
+  @override
+  Widget build(BuildContext context) =>
+      const Scaffold(body: Center(child: CircularProgressIndicator()));
+}

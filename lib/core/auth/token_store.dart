@@ -40,7 +40,7 @@ class TokenStore {
   Future<void> clear() async {
     _cached = null;
     try {
-      await _storage.deleteAll();
+      await _storage.delete(key: _key);
     } catch (_) {}
   }
 }

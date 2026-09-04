@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../app/layout_shell.dart';
 import 'answer_flow.dart';
+import '../../core/auth/auth_controller.dart';
 import 'questions_providers.dart';
 
 /// `/onboarding/questions` — BQ1..BQ5 one per page with autosave (S5-U1..U4).
@@ -24,7 +25,19 @@ class _OnboardingQuestionsScreenState
   Widget build(BuildContext context) {
     final questions = ref.watch(questionsProvider);
     return Scaffold(
-      appBar: AppBar(title: const Text('Your 5 questions')),
+      appBar: AppBar(
+        title: const Text('Your 5 questions'),
+        actions: [
+          // The only exit from a screen outside the shell: a person who signed
+          // into the wrong account had no way out but clearing browser storage
+          // (audit 2026-09-02).
+          TextButton(
+            onPressed: () =>
+                ref.read(authControllerProvider.notifier).logOut(),
+            child: const Text('Sign out'),
+          ),
+        ],
+      ),
       body: LayoutShell(
         child: questions.when(
           loading: () => const Center(child: CircularProgressIndicator()),

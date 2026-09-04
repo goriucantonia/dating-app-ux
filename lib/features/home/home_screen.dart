@@ -118,7 +118,7 @@ class _HeroState extends ConsumerState<_Hero> {
     } on ApiException catch (e) {
       messenger.showSnackBar(SnackBar(content: Text(e.message)));
     } catch (e) {
-      messenger.showSnackBar(SnackBar(content: Text('$e')));
+      messenger.showSnackBar(SnackBar(content: Text('Something went wrong on this device. Please try again.')));
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -206,6 +206,19 @@ class _RunningCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
+    // The history list is a cached one-shot read; when the poller sees the
+    // run reach a terminal state, refetch it — otherwise this card kept
+    // spinning over a finished analysis until pull-to-refresh, with the
+    // start button hidden behind it (audit 2026-09-02).
+    ref.listen<AsyncValue<Analysis>>(analysisPollerProvider(analysisId),
+        (previous, next) {
+      final status = next.valueOrNull?.status;
+      if (status != null &&
+          terminalStatuses.contains(status) &&
+          previous?.valueOrNull?.status != status) {
+        ref.invalidate(analysisHistoryProvider);
+      }
+    });
     final state = ref.watch(analysisPollerProvider(analysisId));
     final status = state.valueOrNull?.status ?? 'matching';
     return Card(

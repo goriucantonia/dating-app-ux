@@ -15,6 +15,8 @@ abstract class Question with _$Question {
     required bool answered,
     @JsonKey(name: 'answer_text') String? answerText,
     @JsonKey(name: 'answer_updated_at') String? answerUpdatedAt,
+    // Which trait a dispute question is about (null for baseline/pool).
+    @JsonKey(name: 'trait_id') String? traitId,
   }) = _Question;
 
   factory Question.fromJson(Map<String, dynamic> json) => _$QuestionFromJson(json);

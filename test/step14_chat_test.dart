@@ -134,7 +134,8 @@ class _FakeChat extends ChatRepository {
       MessagesPage(messages: history.where((m) => m.seq > afterSeq).toList());
 
   @override
-  Future<ReplyResult> send(String sessionId, String text) async {
+  Future<ReplyResult> send(String sessionId, String text,
+      {String? clientMessageId}) async {
     if (hold != null) await hold!.future;
     if (failNextSend) {
       failNextSend = false;
@@ -384,7 +385,8 @@ void main() {
     expect(find.byType(ChatListScreen), findsOneWidget);
     expect(find.text('Ended'), findsOneWidget);
     expect(find.text('Active'), findsNothing);
-    expect(find.text('Demo'), findsOneWidget); // the chip survives onto the list
+    // Owner decision 2026-09-02: the Demo label is not shown any more.
+    expect(find.text('Demo'), findsNothing);
   });
 
   testWidgets('the list: active first, then ended; empty state points home',

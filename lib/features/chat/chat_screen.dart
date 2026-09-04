@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -38,6 +40,14 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   bool _loading = true;
   bool _sending = false;
   int _errorCounter = 0;
+  int _lastSeq = 0;
+  /// Client ids for sends that have not been acknowledged, keyed by text,
+  /// so a retry of the same words carries the same id (idempotent on the
+  /// server since migration 0013).
+  final Map<String, String> _pendingIds = {};
+  /// Which client id a given optimistic bubble carried, so a resync can
+  /// retire exactly that id.
+  final Map<String, String> _pendingIdForTemp = {};
 
   ChatRepository get _repo => ref.read(chatRepositoryProvider);
 
@@ -62,6 +72,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       while (true) {
         final page = await _repo.messages(widget.sessionId, afterSeq: after);
         all.addAll(page.messages);
+        _lastSeq = page.nextAfterSeq;
         if (!page.hasMore) break;
         after = page.nextAfterSeq;
       }
@@ -86,6 +97,28 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     }
   }
 
+  /// After a timeout: fetch anything newer than what we have. True when the
+  /// send had in fact landed and the thread is now current.
+  Future<bool> _resync(String tempId) async {
+    try {
+      final page = await _repo.messages(widget.sessionId, afterSeq: _lastSeq);
+      if (!mounted || page.messages.isEmpty) return false;
+      // Acknowledged by the re-read, so the id is spent: keeping it made a
+      // LATER identical message replay this pair (review 2026-09-03).
+      _pendingIds.removeWhere((_, id) => id == _pendingIdForTemp[tempId]);
+      _pendingIdForTemp.remove(tempId);
+      setState(() {
+        _bubbles.removeWhere((b) => b.id == tempId || b.isError);
+        _bubbles.addAll(page.messages.map(_toBubble));
+        _lastSeq = page.nextAfterSeq;
+        _sending = false;
+      });
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
   ChatBubble _toBubble(ChatMessageModel m) => ChatBubble(
         id: m.messageId,
         text: m.text,
@@ -103,17 +136,35 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       _sending = true;
     });
     try {
-      final result = await _repo.send(widget.sessionId, text);
+      final clientId = _pendingIds.putIfAbsent(
+        text,
+        () => '${DateTime.now().microsecondsSinceEpoch}-'
+            '${Random().nextInt(1 << 32)}',
+      );
+      _pendingIdForTemp[tempId] = clientId;
+      final result = await _repo.send(widget.sessionId, text,
+          clientMessageId: clientId);
       if (!mounted) return;
+      _pendingIds.remove(text);
+      _pendingIdForTemp.remove(tempId);
       setState(() {
         _bubbles.removeWhere((b) => b.id == tempId || b.isError);
         _bubbles
           ..add(_toBubble(result.userMessage))
           ..add(_toBubble(result.personaMessage));
+        _lastSeq = result.personaMessage.seq;
         _sending = false;
       });
     } catch (e) {
       if (!mounted) rethrow;
+      if (e is ApiException && e.mayHaveLanded) {
+        // The server may have stored both messages after we gave up waiting
+        // (replies can take longer than any timeout on a slow free-tier
+        // day). Re-read before offering a resend that would double-post
+        // (audit 2026-09-02).
+        if (await _resync(tempId)) return;
+        if (!mounted) rethrow;
+      }
       setState(() {
         _bubbles.removeWhere((b) => b.id == tempId || b.isError);
         _bubbles.add(ChatBubble(

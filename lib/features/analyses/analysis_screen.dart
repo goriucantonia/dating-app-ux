@@ -172,6 +172,7 @@ class _SimulatingPhase extends ConsumerWidget {
         ),
         const SizedBox(height: 8),
         dates.when(
+          skipLoadingOnReload: true, // keep the checklist up between stages
           loading: () => const Padding(
             padding: EdgeInsets.all(16),
             child: Center(child: CircularProgressIndicator()),
@@ -554,7 +555,7 @@ class _CandidateCardState extends ConsumerState<_CandidateCard> {
       messenger.showSnackBar(SnackBar(content: Text(e.message)));
     } catch (e) {
       // Every submit ends in a visible outcome (D-005).
-      messenger.showSnackBar(SnackBar(content: Text('$e')));
+      messenger.showSnackBar(SnackBar(content: Text('Something went wrong on this device. Please try again.')));
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -855,6 +856,9 @@ class _SimulateButtonState extends ConsumerState<_SimulateButton> {
       await ref
           .read(analysisPollerProvider(widget.analysisId).notifier)
           .kick();
+      // Handed back: if the row does not flip inside the kick window the
+      // button used to say "Starting…" for ever (audit 2026-09-02).
+      if (mounted) setState(() => _starting = false);
     } catch (e) {
       // D-005: a submit that fails must SAY so. Catching only ApiException
       // here would leave a storage- or transport-level failure showing the

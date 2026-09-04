@@ -16,6 +16,7 @@ _Question _$QuestionFromJson(Map<String, dynamic> json) => _Question(
   answered: json['answered'] as bool,
   answerText: json['answer_text'] as String?,
   answerUpdatedAt: json['answer_updated_at'] as String?,
+  traitId: json['trait_id'] as String?,
 );
 
 Map<String, dynamic> _$QuestionToJson(_Question instance) => <String, dynamic>{
@@ -28,6 +29,7 @@ Map<String, dynamic> _$QuestionToJson(_Question instance) => <String, dynamic>{
   'answered': instance.answered,
   'answer_text': instance.answerText,
   'answer_updated_at': instance.answerUpdatedAt,
+  'trait_id': instance.traitId,
 };
 
 _PoolProgress _$PoolProgressFromJson(Map<String, dynamic> json) =>

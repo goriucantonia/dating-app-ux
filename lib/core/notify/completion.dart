@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../features/analyses/analyses_repository.dart';
 import '../../features/analyses/models.dart';
 import 'local_notification.dart';
 
@@ -42,6 +43,9 @@ class CompletionListener extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     ref.listen<Analysis?>(finishedAnalysisProvider, (_, next) {
       if (next == null) return;
+      // Wherever the user is standing, the dashboard's cached history is now
+      // behind; refresh it so the Home tab is coherent when they get there.
+      ref.invalidate(analysisHistoryProvider);
       final failed = next.status == 'failed';
       final title = failed ? 'Your analysis stopped' : 'Your dates have finished';
       final body = failed

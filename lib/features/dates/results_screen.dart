@@ -50,6 +50,10 @@ class ResultsScreen extends ConsumerWidget {
                 ref.read(analysisPollerProvider(analysisId).notifier).refreshNow(),
           ),
           data: (a) => dates.when(
+            // Every progress write re-runs `datesProvider`; without this the
+            // whole body became a spinner ~7 times per run and every expanded
+            // card collapsed (audit 2026-09-02).
+            skipLoadingOnReload: true,
             loading: () => const Center(child: CircularProgressIndicator()),
             error: (e, _) => _ErrorRetry(
               message: e is ApiException ? e.message : "Couldn't load the dates.",
@@ -77,6 +81,25 @@ class _Body extends StatelessWidget {
     final running = a.status == 'simulating';
     final judgingFailed = stage == 'judging_failed';
     final notJudged = a.progress?['judged'] == false;
+
+    if (!running && a.status != 'complete' && payload.dates.isEmpty) {
+      // Reachable by URL or browser history for a `matched`, `matching`,
+      // `no_candidates` or `failed` analysis: there are no results to
+      // rank, and the masthead used to say "0 dates · No score" as if
+      // that were one (audit 2026-09-02).
+      return ListView(
+        padding: const EdgeInsets.all(20),
+        children: [
+          _Notice(
+            title: 'No dates have run yet',
+            body: a.status == 'matched'
+                ? 'Your matches are ready. Open the analysis to start the dates.'
+                : 'There are no results for this analysis. Open it to see where it stands.',
+            onTap: () => context.go('/analyses/${a.id}'),
+          ),
+        ],
+      );
+    }
 
     // Ranked by score; unscored last, and unscored is NOT zero.
     final ranked = [...a.candidates]..sort((x, y) {
@@ -334,7 +357,8 @@ class _CandidateResultState extends State<_CandidateResult> {
     final scoreNote = judged.isEmpty
         ? ''
         : anyPartial
-            ? '${judged.length} dates · 1 partial ×$partialDateWeight'
+            ? '${judged.length} dates · '
+                '${judged.where((d) => d.evaluation!.isPartial).length} partial ×$partialDateWeight'
             : 'mean of ${judged.length} '
                 'date${judged.length == 1 ? '' : 's'}';
 
@@ -1129,7 +1153,7 @@ class _SelectionFooterState extends ConsumerState<SelectionFooter> {
       messenger.showSnackBar(SnackBar(content: Text(e.message)));
     } catch (e) {
       // Every submit ends in a visible outcome (D-005).
-      messenger.showSnackBar(SnackBar(content: Text('$e')));
+      messenger.showSnackBar(SnackBar(content: Text('Something went wrong on this device. Please try again.')));
     } finally {
       if (mounted) setState(() => _busy = false);
     }

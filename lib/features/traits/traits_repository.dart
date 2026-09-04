@@ -1,7 +1,10 @@
+import 'dart:async';
+
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/api/api_client.dart';
+import '../../core/auth/auth_controller.dart';
 import 'models.dart';
 
 class TraitsRepository {
@@ -26,7 +29,8 @@ class TraitsRepository {
   Future<DisputeResult> dispute(String traitId, {String? correction}) async {
     final r = await _wrap(() => _dio.post<Map<String, dynamic>>(
         '/traits/$traitId/dispute',
-        data: {if (correction != null && correction.isNotEmpty) 'correction': correction}));
+        data: {if (correction != null && correction.isNotEmpty) 'correction': correction},
+        options: modelCallOptions));
     return DisputeResult.fromJson(r.data!);
   }
 
@@ -42,5 +46,10 @@ class TraitsRepository {
 final traitsRepositoryProvider =
     Provider<TraitsRepository>((ref) => TraitsRepository(ref.watch(apiClientProvider)));
 
-final traitsProvider = FutureProvider<TraitsPayload>(
-    (ref) async => ref.watch(traitsRepositoryProvider).fetch());
+final traitsProvider = FutureProvider<TraitsPayload>((ref) async {
+  // Signed out (or not yet known): no request. A tokenless fetch here was
+  // a 401 nobody wanted, and a second fetch the moment auth resolved.
+  // Loading until a person is signed in; rebuilt when that changes.
+  if (ref.watch(currentUserIdProvider) == null) return Completer<TraitsPayload>().future;
+  return ref.watch(traitsRepositoryProvider).fetch();
+});

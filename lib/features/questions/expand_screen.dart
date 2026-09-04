@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../app/layout_shell.dart';
 import '../../core/api/api_client.dart';
@@ -32,6 +33,13 @@ class _ExpandScreenState extends ConsumerState<ExpandScreen> {
     try {
       final batch = await ref.read(questionsRepositoryProvider).nextBatch();
       if (!mounted) return;
+      if (batch.status == 'pool_exhausted' || batch.questions.isEmpty) {
+        // The cached list was behind the server. `_activeBatch!.first` on an
+        // empty list was a red screen (audit 2026-09-02); refetching flips
+        // the screen to its exhausted state instead.
+        ref.invalidate(questionsProvider);
+        return;
+      }
       setState(() => _activeBatch = batch.questions);
     } on ApiException catch (e) {
       setState(() => _error = e.message);
@@ -49,6 +57,11 @@ class _ExpandScreenState extends ConsumerState<ExpandScreen> {
       _editing = null;
     });
     ref.invalidate(questionsProvider);
+    // profile_settings.md §1: "completing a batch triggers extract → compile
+    // with the same Building screen". Nothing did (audit 2026-09-02): the
+    // new answers were saved and never read, so the profile, the staleness
+    // banner and the matches could not move. Same for an edit.
+    context.go('/onboarding/building?to=${Uri.encodeComponent('/profile')}');
   }
 
   @override

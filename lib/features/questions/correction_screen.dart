@@ -101,19 +101,13 @@ class CorrectionScreen extends ConsumerWidget {
                   onFinished: () {
                     ref.invalidate(questionsProvider);
                     ref.invalidate(traitsProvider);
-                    final router = GoRouter.of(context);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text(
-                          'Thanks — your profile will be rebuilt with this.',
-                        ),
-                      ),
-                    );
-                    if (router.canPop()) {
-                      router.pop();
-                    } else {
-                      router.go('/profile');
-                    }
+                    // The snackbar used to PROMISE a rebuild that nothing
+                    // performed (audit 2026-09-02; the D-018 lesson again).
+                    // Now the answer goes straight into a re-read, on the
+                    // same building screen onboarding uses, and lands back
+                    // on the profile with the correction applied.
+                    GoRouter.of(context).go(
+                        '/onboarding/building?to=${Uri.encodeComponent('/profile')}');
                   },
                   ),
                 ),

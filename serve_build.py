@@ -30,6 +30,13 @@ class SpaHandler(SimpleHTTPRequestHandler):
             self.path = "/index.html"
         super().do_GET()
 
+    def end_headers(self) -> None:
+        # A rebuilt app served under the old cached copy shows the new code
+        # with the old tree-shaken icon font — every new icon a box. Tell
+        # the browser (and Flutter's service worker) to keep nothing.
+        self.send_header("Cache-Control", "no-store, must-revalidate")
+        super().end_headers()
+
     def log_message(self, *args) -> None:
         pass  # quiet: the point of the run is the browser, not this
 

@@ -63,6 +63,14 @@ class _CalibrationScreenState extends ConsumerState<CalibrationScreen> {
         _error = ex.message;
         _starting = false;
       });
+    } catch (e) {
+      // D-005 shape: anything else left `_starting` true — a spinner with no
+      // words, for ever (audit 2026-09-02).
+      if (!mounted) return;
+      setState(() {
+        _error = 'Something went wrong on this device. Please try again.';
+        _starting = false;
+      });
     }
   }
 
@@ -76,7 +84,8 @@ class _CalibrationScreenState extends ConsumerState<CalibrationScreen> {
     try {
       final r = await _dio.post<Map<String, dynamic>>(
           '/calibration/sessions/$_sessionId/messages',
-          data: {'text': text});
+          data: {'text': text},
+          options: modelCallOptions);
       if (!mounted) return;
       setState(() {
         _bubbles.add(ChatBubble(

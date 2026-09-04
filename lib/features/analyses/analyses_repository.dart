@@ -1,7 +1,10 @@
+import 'dart:async';
+
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/api/api_client.dart';
+import '../../core/auth/auth_controller.dart';
 import 'models.dart';
 
 /// Raised when the server says an analysis is already running (409).
@@ -78,6 +81,7 @@ class AnalysesRepository {
     try {
       final r = await _dio.post<Map<String, dynamic>>(
         '/analyses/$analysisId/candidates/$candidateUserId/reject',
+        options: modelCallOptions, // may refresh an embedding
       );
       return Analysis.fromJson(r.data!);
     } on DioException catch (e) {
@@ -100,5 +104,10 @@ class AnalysesRepository {
 final analysesRepositoryProvider = Provider<AnalysesRepository>(
     (ref) => AnalysesRepository(ref.watch(apiClientProvider)));
 
-final analysisHistoryProvider = FutureProvider<List<Analysis>>(
-    (ref) async => ref.watch(analysesRepositoryProvider).history());
+final analysisHistoryProvider = FutureProvider<List<Analysis>>((ref) async {
+  // Signed out (or not yet known): no request. A tokenless fetch here was
+  // a 401 nobody wanted, and a second fetch the moment auth resolved.
+  // Loading until a person is signed in; rebuilt when that changes.
+  if (ref.watch(currentUserIdProvider) == null) return Completer<List<Analysis>>().future;
+  return ref.watch(analysesRepositoryProvider).history();
+});

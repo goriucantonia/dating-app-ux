@@ -1,7 +1,10 @@
+import 'dart:async';
+
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/api/api_client.dart';
+import '../../core/auth/auth_controller.dart';
 import 'models.dart';
 
 /// Raised when the server says this analysis already has a selection (409).
@@ -67,10 +70,18 @@ class ChatRepository {
 
   /// S14-U6/U7. Throws [ApiException] with code `reply_failed` on the
   /// server's give-up — the caller keeps the text in the composer.
-  Future<ReplyResult> send(String sessionId, String text) async {
+  ///
+  /// [clientMessageId] is reused on a retry of the SAME send, so a resend
+  /// after a timeout gets the stored pair back instead of posting twice.
+  Future<ReplyResult> send(String sessionId, String text,
+      {String? clientMessageId}) async {
     final r = await _wrap(() => _dio.post<Map<String, dynamic>>(
           '/chat/sessions/$sessionId/messages',
-          data: {'text': text},
+          data: {
+            'text': text,
+            'client_message_id': ?clientMessageId,
+          },
+          options: modelCallOptions,
         ));
     return ReplyResult.fromJson(r.data!);
   }
@@ -94,8 +105,13 @@ final chatRepositoryProvider =
     Provider<ChatRepository>((ref) => ChatRepository(ref.watch(apiClientProvider)));
 
 /// The session list. Invalidated after a selection and after ending a chat.
-final chatSessionsProvider = FutureProvider<List<ChatSessionSummary>>(
-    (ref) async => ref.watch(chatRepositoryProvider).sessions());
+final chatSessionsProvider = FutureProvider<List<ChatSessionSummary>>((ref) async {
+  // Signed out (or not yet known): no request. A tokenless fetch here was
+  // a 401 nobody wanted, and a second fetch the moment auth resolved.
+  // Loading until a person is signed in; rebuilt when that changes.
+  if (ref.watch(currentUserIdProvider) == null) return Completer<List<ChatSessionSummary>>().future;
+  return ref.watch(chatRepositoryProvider).sessions();
+});
 
 /// The selection made for one analysis, if any — what the results footer
 /// reads to turn "Choose X" into "already chose X" (S14-U2).

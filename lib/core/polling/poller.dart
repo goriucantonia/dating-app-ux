@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../features/analyses/analyses_repository.dart';
 import '../../features/analyses/models.dart';
+import '../api/api_client.dart';
+import '../auth/auth_controller.dart';
 import '../notify/completion.dart';
 
 /// THE polling primitive (S10-U1, `ux_architecture.md` §1.4).
@@ -46,6 +48,8 @@ class AnalysisPoller extends StateNotifier<AsyncValue<Analysis>> {
   AnalysisPoller(this._repo, this._id, {this.onFinished})
       : super(const AsyncValue.loading()) {
     _startedAt = DateTime.now();
+    // No screen can create a poller before the session is known: the
+    // router holds everything on /splash until auth resolves.
     unawaited(_tick());
   }
 
@@ -86,6 +90,14 @@ class AnalysisPoller extends StateNotifier<AsyncValue<Analysis>> {
       // network briefly gone. Surface it, keep the loop, let the next tick
       // recover — and only show the error state if there is nothing to show.
       if (state is! AsyncData) state = AsyncValue.error(e, st);
+      if (e is ApiException && const {401, 403, 404}.contains(e.status)) {
+        // Except these, which the next tick cannot fix: the session is dead,
+        // or the analysis is not this user's, or it no longer exists. A loop
+        // that kept going here ran for the life of the page and, on a 401,
+        // signed the user out again every few seconds (audit 2026-09-02).
+        _timer?.cancel();
+        return;
+      }
     }
     if (!mounted) return;
     _timer?.cancel();
@@ -119,9 +131,20 @@ class AnalysisPoller extends StateNotifier<AsyncValue<Analysis>> {
 /// Deliberately NOT autoDispose — see property 1 above.
 final analysisPollerProvider = StateNotifierProvider.family<AnalysisPoller,
     AsyncValue<Analysis>, String>(
-  (ref, id) => AnalysisPoller(
-    ref.watch(analysesRepositoryProvider),
-    id,
-    onFinished: (a) => ref.read(finishedAnalysisProvider.notifier).state = a,
-  ),
+  (ref, id) {
+    // Not WATCHED on the signed-in user (that would rebuild the family, and
+    // restart the schedule, the moment auth resolved after a cold start)
+    // but LISTENED: a change from one known user to another, or to signed
+    // out, throws this loop away. Without that, a poller stopped by a 401
+    // stayed dead — stale status, no loop, no retry — after the person
+    // signed back in (review 2026-09-03).
+    ref.listen<String?>(currentUserIdProvider, (previous, next) {
+      if (previous != null && next != previous) ref.invalidateSelf();
+    });
+    return AnalysisPoller(
+      ref.watch(analysesRepositoryProvider),
+      id,
+      onFinished: (a) => ref.read(finishedAnalysisProvider.notifier).state = a,
+    );
+  },
 );

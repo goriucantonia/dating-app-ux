@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
 import '../../app/layout_shell.dart';
 import '../../core/api/api_client.dart';
@@ -35,7 +34,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       messenger.showSnackBar(SnackBar(content: Text(e.message)));
     } catch (e) {
       // Every user-triggered action ends in a visible outcome (D-005).
-      messenger.showSnackBar(SnackBar(content: Text('$e')));
+      messenger.showSnackBar(SnackBar(content: Text('Something went wrong on this device. Please try again.')));
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -55,7 +54,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       body: LayoutShell(
         child: auth.when(
           loading: () => const Center(child: CircularProgressIndicator()),
-          error: (e, _) => Center(child: Text('$e')),
+          error: (e, _) => Center(
+              child: Text(e is ApiException ? e.message : "Couldn't load your account.")),
           data: (user) {
             if (user == null) return const SizedBox.shrink();
             return ListView(
@@ -253,12 +253,24 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     try {
       receipt = await ref.read(authRepositoryProvider).deleteMe();
     } on ApiException catch (e) {
+      if (e.mayHaveLanded || e.code == 'network') {
+        // The request may have reached the server. If the account is gone,
+        // every next call would 401 into a silent login page and the login
+        // would then say the credentials are wrong (audit 2026-09-02). Ask.
+        if (await _accountIsGone()) {
+          if (!mounted) return;
+          messenger.showSnackBar(const SnackBar(
+              content: Text('Your account has been deleted.')));
+          await ref.read(authControllerProvider.notifier).logOut();
+          return;
+        }
+      }
       if (mounted) setState(() => _busy = false);
       messenger.showSnackBar(SnackBar(content: Text(e.message)));
       return;
     } catch (e) {
       if (mounted) setState(() => _busy = false);
-      messenger.showSnackBar(SnackBar(content: Text('$e')));
+      messenger.showSnackBar(SnackBar(content: Text('Something went wrong on this device. Please try again.')));
       return;
     }
     if (!mounted) return;
@@ -291,6 +303,17 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     );
     if (!mounted) return;
     await ref.read(authControllerProvider.notifier).logOut();
+  }
+
+  Future<bool> _accountIsGone() async {
+    try {
+      await ref.read(authRepositoryProvider).me();
+      return false;
+    } on ApiException catch (e) {
+      return e.status == 401;
+    } catch (_) {
+      return false;
+    }
   }
 
   Future<void> _editText({

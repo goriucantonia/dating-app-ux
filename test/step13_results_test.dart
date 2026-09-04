@@ -24,6 +24,8 @@ import 'package:dating_app_ux/features/analyses/analysis_screen.dart';
 import 'package:dating_app_ux/features/analyses/models.dart';
 import 'package:dating_app_ux/features/auth/models.dart';
 import 'package:dating_app_ux/features/dates/curves.dart';
+import 'package:dating_app_ux/features/chat/chat_repository.dart';
+import 'package:dating_app_ux/features/chat/models.dart';
 import 'package:dating_app_ux/features/dates/dates_repository.dart';
 import 'package:dating_app_ux/features/dates/metadata_toggle.dart';
 import 'package:dating_app_ux/features/dates/models.dart';
@@ -295,6 +297,13 @@ class _FakeAnalyses extends AnalysesRepository {
   Future<List<Analysis>> history() async => analyses;
 }
 
+class _FakeChat extends ChatRepository {
+  _FakeChat() : super(Dio());
+
+  @override
+  Future<List<ChatSessionSummary>> sessions() async => const [];
+}
+
 class _FakeDates extends DatesRepository {
   _FakeDates({required this.payload, required this.transcripts}) : super(Dio());
 
@@ -351,6 +360,10 @@ Widget _app({
       authControllerProvider.overrideWith(_SignedIn.new),
       analysesRepositoryProvider.overrideWithValue(analyses),
       datesRepositoryProvider.overrideWithValue(dates),
+      // No real HTTP from a widget test: the results footer reads the chat
+      // sessions, and an un-overridden repository dialled localhost — with a
+      // connect timer still pending at teardown (audit 2026-09-02).
+      chatRepositoryProvider.overrideWithValue(_FakeChat()),
     ],
     child: MaterialApp.router(
       routerConfig: router,
@@ -470,7 +483,8 @@ void main() {
     expect(find.text('No score'), findsOneWidget);
     expect(find.text('0.0'), findsNothing);
     // The Demo chip survives onto the results (§6).
-    expect(find.text('Demo'), findsAtLeastNWidgets(1));
+    // Owner decision 2026-09-02: the Demo label is not shown any more.
+    expect(find.text('Demo'), findsNothing);
   });
 
   testWidgets('results: tapping a score shows the four checks and the arithmetic',

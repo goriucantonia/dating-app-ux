@@ -79,10 +79,24 @@ class _TranscriptScreenState extends ConsumerState<TranscriptScreen> {
       body: LayoutShell(
         child: transcript.when(
           loading: () => const Center(child: CircularProgressIndicator()),
-          error: (e, _) => _ErrorRetry(
-            message: e is ApiException ? e.message : "Couldn't load this date.",
-            onRetry: () => ref.invalidate(transcriptProvider(widget.dateId)),
-          ),
+          error: (e, _) => (e is ApiException && e.status == 404)
+              // S15-U2 shape, as the chat screen already has it: a date that
+              // is gone went with the person it was with. No retry can
+              // bring it back.
+              ? const Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(24),
+                    child: Text(
+                      'This date is no longer here — the person it was with '
+                      'has left.',
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                )
+              : _ErrorRetry(
+                  message: e is ApiException ? e.message : "Couldn't load this date.",
+                  onRetry: () => ref.invalidate(transcriptProvider(widget.dateId)),
+                ),
           data: (t) {
             WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToAnchor());
             return _Body(

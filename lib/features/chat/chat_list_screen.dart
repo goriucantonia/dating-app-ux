@@ -18,13 +18,8 @@ class ChatListScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final sessions = ref.watch(chatSessionsProvider);
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Your chats'),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.go('/'),
-        ),
-      ),
+      // A tab root has no back arrow (D-018's rule, which Settings follows).
+      appBar: AppBar(title: const Text('Your chats')),
       body: LayoutShell(
         child: RefreshIndicator(
           onRefresh: () async => ref.invalidate(chatSessionsProvider),

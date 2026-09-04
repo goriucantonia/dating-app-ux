@@ -58,3 +58,11 @@ class AuthController extends AsyncNotifier<User?> {
 
 final authControllerProvider =
     AsyncNotifierProvider<AuthController, User?>(AuthController.new);
+
+/// The signed-in user's id, or null. Every provider that caches something
+/// belonging to ONE person watches this, so a sign-out or a different
+/// sign-in rebuilds it — the traits, persona, history and chat providers
+/// used to survive logout and show the previous account's data to the next
+/// one (audit 2026-09-02).
+final currentUserIdProvider =
+    Provider<String?>((ref) => ref.watch(authControllerProvider).valueOrNull?.id);

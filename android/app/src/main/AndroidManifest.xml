@@ -1,4 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Only the debug/profile manifests carried this; a release build
+         could not reach the API at all (audit 2026-09-02). -->
+    <uses-permission android:name="android.permission.INTERNET"/>
     <application
         android:label="dating_app_ux"
         android:name="${applicationName}"
